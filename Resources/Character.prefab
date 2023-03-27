@@ -578,7 +578,7 @@ Transform:
   m_Children:
   - {fileID: 13094175184847051}
   m_Father: {fileID: 0}
-  m_RootOrder: 7
+  m_RootOrder: 3
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &568605932393785783
 MonoBehaviour:
@@ -592,3 +592,5 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b8fd1fa4e85edf647ba6dc8964b5a8dd, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  nameField: {fileID: 6710178126697412738}
+  script: {fileID: 568605932393785783}

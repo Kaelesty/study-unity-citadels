@@ -450,7 +450,7 @@ Transform:
   - {fileID: 4384912528337743014}
   - {fileID: 317087465711718134}
   m_Father: {fileID: 0}
-  m_RootOrder: 3
+  m_RootOrder: 7
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &-79386210617865225
 MonoBehaviour:
@@ -522,6 +522,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   positionID: 0
   networkID: 0
+  charPrefab: {fileID: 7256188863207879379, guid: 5df91eeae3ab48140b0dadf7c847cc27, type: 3}
   Camera: {fileID: 5250312853350397481}
   Cursor: {fileID: 8447485983035601549}
   Body: {fileID: 224985906955299805}

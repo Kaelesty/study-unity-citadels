@@ -436,7 +436,7 @@ GameObject:
   - component: {fileID: 711633248}
   - component: {fileID: 711633247}
   m_Layer: 0
-  m_Name: Deck
+  m_Name: DeckManager
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -454,7 +454,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 17d62c4fe01f0ec44bf32eeafe55cafa, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  characterPrefab: {fileID: 0}
+  deck: []
+  laidOutPublic: 
 --- !u!4 &711633248
 Transform:
   m_ObjectHideFlags: 0
@@ -597,7 +598,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: bb79557e9de6fd7489f74ab7c210ddd0, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  activePlayerID: 0
   networkID: -1
 --- !u!4 &1178739009
 Transform:
