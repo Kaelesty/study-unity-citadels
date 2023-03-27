@@ -13,6 +13,8 @@ public class Player : MonoBehaviourPunCallbacks
     public GameObject Cursor;
     public GameObject Body;
     public GameObject UI;
+    public GameObject Indicator;
+
     public Player scriptPlayer;
     public Button endButton;
 
@@ -41,7 +43,7 @@ public class Player : MonoBehaviourPunCallbacks
         {
             Body.SetActive(false);
         }
-
+        Indicator.SetActive(false);
 
         endButton.GetComponent<Button>().onClick.AddListener(endTurn);
         UI.SetActive(false);
@@ -49,23 +51,31 @@ public class Player : MonoBehaviourPunCallbacks
 
     }
 
-    void Start()
-    {
-        
-
-    }
-
-    public void switchActivePlayerID()
-    {
-
-    }
-
-
-    // Update is called once per frame
     void Update()
     {
-        UI.SetActive(turnManager.getActivePlayerID() == networkID);
-        
+        if (turnManager.getActivePlayerID() == networkID)
+        {
+            UI.SetActive(true);
+            view.RPC("enableIndicator", RpcTarget.All);
+        }
+        else
+        {
+            UI.SetActive(false);
+            view.RPC("disableIndicator", RpcTarget.All);
+        }
+
+    }
+
+    [PunRPC]
+    void disableIndicator()
+    {
+        Indicator.SetActive(false);
+    }
+
+    [PunRPC]
+    void enableIndicator()
+    {
+        Indicator.SetActive(true);
     }
 
     public void endTurn()
