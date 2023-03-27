@@ -13,15 +13,7 @@ public class TurnManager : MonoBehaviourPunCallbacks
     {
         view = GetComponent<PhotonView>();
 
-    }
-    public bool checkTurn()
-    {
-        Debug.Log($"APID {activePlayerID}");
-        Debug.Log($"NID  {networkID}");
-        return activePlayerID == networkID;
-    }
-
-    
+    }    
     public void switchActivePlayerID()
     {
         activePlayerID += 1;
