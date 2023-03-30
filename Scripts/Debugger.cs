@@ -1,9 +1,11 @@
 using UnityEngine;
-
+// Этот скрипт висит на Background в сцене Game
+// раскомментить, если нужна дебаг-консоль в билде
 namespace DebugStuff
 {
     public class ConsoleToGUI : MonoBehaviour
     {
+        
         /*
         //#if !UNITY_EDITOR
         static string myLog = "";

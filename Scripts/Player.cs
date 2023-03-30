@@ -3,32 +3,34 @@ using Photon.Pun.UtilityScripts;
 using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.UI;
+using System;
 
 public class Player : MonoBehaviourPunCallbacks
 {
     PhotonView view;
-    public int positionID;
-    public int networkID;
+    public int positionID; // id позиции игрока на столе, получаемый из SpawnManager (не синхронизируется)
+    public int networkID; // id КЛИЕНТА в сети (почему то начинается с 1)
 
     public GameObject charPrefab;
 
     public GameObject Camera;
-    public GameObject Cursor;
-    public GameObject Body;
+    public GameObject Cursor; // индикатор активного игрока (синий треугольник)
+    public GameObject Body; // индикатор другого игрока (красный треугольник)
     public GameObject UI;
-    public GameObject Indicator;
+    public GameObject Indicator; // индикатор текущего хода (белый треугольник)
 
     public Player scriptPlayer;
-    public Button endButton;
 
     private TurnManager turnManager;
     private DeckController deckController;
 
 
-    private bool flag_deckTaken;
-    private string[] deck;
-    
-    private void Awake(){
+    private bool flag_deckTaken; // кусок неиспользуемой логики, который страшно удалить
+    private string[] deck; // названия карт декущей деки, получаемые из DeckController
+    private GameObject characterCard; // карта персонажа на текущем ходу
+
+
+    private void Awake() {
         view = GetComponent<PhotonView>();
 
         turnManager = GameObject.Find("TurnManager").GetComponent<TurnManager>();
@@ -54,14 +56,14 @@ public class Player : MonoBehaviourPunCallbacks
         }
         Indicator.SetActive(false);
 
-        endButton.GetComponent<Button>().onClick.AddListener(endTurn);
         UI.SetActive(false);
-
         flag_deckTaken = false;
     }
 
     void Update()
     {
+        //
+        // TurnManager синхронизирует параметр ActivePlayerID. она равна id клиента => наш ход
         if (turnManager.getActivePlayerID() == networkID)
         {
             UI.SetActive(true);
@@ -71,12 +73,20 @@ public class Player : MonoBehaviourPunCallbacks
                 flag_deckTaken = true;
                 deck = deckController.getDeck();
 
-                for (int i=0;i<deck.Length;i++)
+                for (int i = 0; i < deck.Length; i++)
                 {
                     GameObject charCard = Instantiate(charPrefab, transform.position, Quaternion.identity);
-                    charCard.transform.position += new Vector3(140*i - ((140*deck.Length/2) - 50 - 20), 0, 0);
-                    var text = charCard.GetComponent<CharacterCard>().nameField.GetComponent<Text>();
+                    charCard.transform.position += new Vector3(140 * i - ((140 * deck.Length / 2) - 50 - 20), 0, 0);
+                    var cardScript = charCard.GetComponent<CharacterCard>();
+
+                    // этот кусок кода удалить после написания метода CharacterCard.loadPreset
+                    var text = cardScript.nameField.GetComponent<Text>();
+                    cardScript.canvas.GetComponent<Canvas>().worldCamera = Camera.GetComponent<Camera>();
+                    cardScript.owner = this;
                     text.text = deck[i];
+                    // ^^^^^^^^^^^^^^^^^^^^^^^
+
+                    cardScript.loadPreset(deck[i]); // не написано
                 }
             }
         }
@@ -85,10 +95,35 @@ public class Player : MonoBehaviourPunCallbacks
             UI.SetActive(false);
             view.RPC("disableIndicator", RpcTarget.All);
         }
-        
+
 
     }
 
+    // вызывается из CharacterCard, сохраняет выбранную карту персонажа
+    public void addCharacterCard(GameObject card)
+    {
+        view.RPC("addCharacterCard_RPC", RpcTarget.All, card);
+
+        // RPC не может передавать кастомные типы как аргументы
+        /*
+        TO-DO
+        эта функция принимает string и отправляет его в addCharacterCard_RPC, которая заново инициализирует нужную карту
+        */
+    }
+
+    [PunRPC]
+    void addCharacterCard_RPC(GameObject card)
+    {
+        Destroy(card.GetComponent<CharacterCard>().takeButton);
+        characterCard = card;
+        characterCard.tag = "PlayerCharacterCard";
+        characterCard.transform.parent = transform;
+        characterCard.transform.position = new Vector3(0, 0, 0);
+        endTurn();
+    }
+
+
+    // методы используются для синхронизации индикаторов хода
     [PunRPC]
     void disableIndicator()
     {
@@ -103,7 +138,10 @@ public class Player : MonoBehaviourPunCallbacks
 
     public void endTurn()
     {
-
+        foreach (GameObject card in GameObject.FindGameObjectsWithTag("CharacterCard"))
+        {
+            Destroy(card);
+        }
         turnManager.switchActivePlayerID();
     }
 }

@@ -201,7 +201,19 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 8874659032863287531}
   m_OnClick:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 568605932393785783}
+        m_TargetAssemblyTypeName: CharacterCard, Assembly-CSharp
+        m_MethodName: OnTaken
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
 --- !u!1 &3924312716630923036
 GameObject:
   m_ObjectHideFlags: 0
@@ -559,7 +571,7 @@ GameObject:
   - component: {fileID: 568605932393785783}
   m_Layer: 0
   m_Name: Character
-  m_TagString: Untagged
+  m_TagString: CharacterCard
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -578,7 +590,7 @@ Transform:
   m_Children:
   - {fileID: 13094175184847051}
   m_Father: {fileID: 0}
-  m_RootOrder: 3
+  m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &568605932393785783
 MonoBehaviour:
@@ -593,4 +605,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   nameField: {fileID: 6710178126697412738}
+  takeButton: {fileID: 3554981897498051439}
+  imageSlot: {fileID: 4001051993115716244}
+  owner: {fileID: 0}
   script: {fileID: 568605932393785783}
+  cardObject: {fileID: 7256188863207879379}
+  canvas: {fileID: 6738053512401073376}
