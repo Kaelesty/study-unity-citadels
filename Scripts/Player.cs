@@ -111,12 +111,7 @@ public class Player : MonoBehaviourPunCallbacks
     public void addCharacterCard(string presetName)
     {
         view.RPC("addCharacterCard_RPC", RpcTarget.All, presetName);
-
-        // RPC не может передавать кастомные типы как аргументы
-        /*
-        TO-DO
-        эта функция принимает string и отправляет его в addCharacterCard_RPC, которая заново инициализирует нужную карту
-        */
+        deckController.deleteCard(presetName);
     }
 
     [PunRPC]

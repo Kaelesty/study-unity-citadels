@@ -40,6 +40,11 @@ public class DeckController : MonoBehaviourPunCallbacks
         return deck;
     }
 
+    public void deleteCard(string NameCard)
+    {
+        deck = deck.Where(e => e != NameCard).ToArray();
+    }
+
     public void Start()
     {
         generateDeck();
