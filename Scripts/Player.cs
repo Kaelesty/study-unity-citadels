@@ -60,6 +60,22 @@ public class Player : MonoBehaviourPunCallbacks
         flag_deckTaken = false;
     }
 
+    private GameObject InstantiateCharCard(string presetName)
+    {
+        GameObject charCard = Instantiate(charPrefab, transform.position, Quaternion.identity);
+        
+        var cardScript = charCard.GetComponent<CharacterCard>();
+
+        // этот кусок кода удалить после написания метода CharacterCard.loadPreset
+        var text = cardScript.nameField.GetComponent<Text>();
+        cardScript.canvas.GetComponent<Canvas>().worldCamera = Camera.GetComponent<Camera>();
+        cardScript.owner = this;
+        text.text = presetName;
+        //
+        cardScript.loadPreset(presetName); // не написано
+        return charCard;
+    }
+
     void Update()
     {
         //
@@ -75,18 +91,9 @@ public class Player : MonoBehaviourPunCallbacks
 
                 for (int i = 0; i < deck.Length; i++)
                 {
-                    GameObject charCard = Instantiate(charPrefab, transform.position, Quaternion.identity);
+                    var charCard = InstantiateCharCard(deck[i]);
                     charCard.transform.position += new Vector3(140 * i - ((140 * deck.Length / 2) - 50 - 20), 0, 0);
-                    var cardScript = charCard.GetComponent<CharacterCard>();
-
-                    // этот кусок кода удалить после написания метода CharacterCard.loadPreset
-                    var text = cardScript.nameField.GetComponent<Text>();
-                    cardScript.canvas.GetComponent<Canvas>().worldCamera = Camera.GetComponent<Camera>();
-                    cardScript.owner = this;
-                    text.text = deck[i];
-                    // ^^^^^^^^^^^^^^^^^^^^^^^
-
-                    cardScript.loadPreset(deck[i]); // не написано
+                    
                 }
             }
         }
@@ -99,10 +106,11 @@ public class Player : MonoBehaviourPunCallbacks
 
     }
 
+
     // вызывается из CharacterCard, сохраняет выбранную карту персонажа
-    public void addCharacterCard(GameObject card)
+    public void addCharacterCard(string presetName)
     {
-        view.RPC("addCharacterCard_RPC", RpcTarget.All, card);
+        view.RPC("addCharacterCard_RPC", RpcTarget.All, presetName);
 
         // RPC не может передавать кастомные типы как аргументы
         /*
@@ -112,10 +120,10 @@ public class Player : MonoBehaviourPunCallbacks
     }
 
     [PunRPC]
-    void addCharacterCard_RPC(GameObject card)
+    void addCharacterCard_RPC(string presetName)
     {
-        Destroy(card.GetComponent<CharacterCard>().takeButton);
-        characterCard = card;
+        characterCard = InstantiateCharCard(presetName);
+        Destroy(characterCard.GetComponent<CharacterCard>().takeButton);
         characterCard.tag = "PlayerCharacterCard";
         characterCard.transform.parent = transform;
         characterCard.transform.position = new Vector3(0, 0, 0);

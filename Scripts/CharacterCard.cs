@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using Unity.VisualScripting;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class CharacterCard : MonoBehaviour
 {
@@ -31,7 +32,7 @@ public class CharacterCard : MonoBehaviour
     public void OnTaken()
     {
 
-        owner.addCharacterCard(cardObject);
+        owner.addCharacterCard(nameField.GetComponent<Text>().text);
     }
 
     public void loadPreset(string presetName)
