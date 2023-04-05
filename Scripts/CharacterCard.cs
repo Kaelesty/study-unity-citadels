@@ -13,6 +13,7 @@ public class CharacterCard : MonoBehaviour
     public Player owner;
     public CharacterCard script;
     public GameObject cardObject;
+    public DeckController deckController;
 
     public GameObject canvas;
 
@@ -21,7 +22,7 @@ public class CharacterCard : MonoBehaviour
 
     void Start()
     {
-        
+        deckController = GameObject.Find("DeckManager").GetComponent<DeckController>();
     }
 
     void Update()
@@ -39,12 +40,12 @@ public class CharacterCard : MonoBehaviour
     {
         /*
         TO-DO 
-        Функция принимает название пресета (персонажа), и подгружает из файла/словаря/... :
-
-        Имя         (нужно записать в nameField)
-        Описание    (нужно сохранить в переменную description) (временно, пока нет элемента интерфейса для этого)
-        Картинку    (нужно установить в imageSlot)
-        Цвет(тип)   (нужно записать в переменную color)
+        Функция принимает название пресета (персонажа): "Assassin", "Thief", "Bishop", "Magican", "Architect", "Merchant", "Warlord"
+        И заполняет поля в соответствии с нужным пресетом:
+        Имя         (нужно записать в nameField) (Получается из словаря deckController.getCharNames())
+        Описание    (нужно сохранить в переменную description) (временно, пока нет элемента интерфейса для этого) (Получается из словаря deckController.getCharDesc())
+        Картинку    (нужно установить в imageSlot) (Заглушки картинок лежат в папке images)
+        Цвет(тип)   (нужно записать в переменную color, временно, пока нет элемента интерфейса для этого) (Цвета персонажей как в игре, gold у короля, red у кондотьера, green у торгаша, blue у епископа, white у остальных)
 
         */
     }
