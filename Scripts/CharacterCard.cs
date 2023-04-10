@@ -13,7 +13,7 @@ public class CharacterCard : MonoBehaviour
     public Player owner;
     public CharacterCard script;
     public GameObject cardObject;
-    public DeckController deckController;
+   
 
     public GameObject canvas;
 
@@ -22,7 +22,7 @@ public class CharacterCard : MonoBehaviour
 
     void Start()
     {
-        deckController = GameObject.Find("DeckManager").GetComponent<DeckController>();
+        
     }
 
     void Update()
@@ -33,7 +33,7 @@ public class CharacterCard : MonoBehaviour
     public void OnTaken()
     {
 
-        owner.addCharacterCard(nameField.GetComponent<Text>().text);
+
     }
 
     public void loadPreset(string presetName)
