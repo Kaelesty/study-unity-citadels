@@ -1,6 +1,5 @@
 using System.Collections;
 using System.Collections.Generic;
-using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -13,7 +12,10 @@ public class CharacterCard : MonoBehaviour
     public Player owner;
     public CharacterCard script;
     public GameObject cardObject;
-   
+
+    public Game_Controller controller;
+    private string preset;
+
 
     public GameObject canvas;
 
@@ -22,22 +24,24 @@ public class CharacterCard : MonoBehaviour
 
     void Start()
     {
-        
+
     }
 
     void Update()
     {
-        
+
     }
 
     public void OnTaken()
     {
-
-
+        controller.characterSelected();
+        owner.cardSelected(preset);
     }
 
     public void loadPreset(string presetName)
     {
+        preset = presetName;
+        nameField.GetComponent<Text>().text = presetName;
         /*
         TO-DO 
         Функция принимает название пресета (персонажа): "Assassin", "Thief", "Bishop", "Magican", "Architect", "Merchant", "Warlord"

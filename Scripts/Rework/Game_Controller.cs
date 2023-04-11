@@ -4,22 +4,23 @@ using System.Collections.Generic;
 using UnityEngine;
 using System;
 using System.Linq;
-using System.Security.Cryptography;
-using Unity.Burst.Intrinsics;
-using Unity.VisualScripting;
-using UnityEditor.U2D.Animation;
+using UnityEngine.UI;
 
 public class Game_Controller : MonoBehaviour
 {
     private System.Random random = new System.Random();
+
+    public GameObject canvas;
+    public GameObject camera;
+    public GameObject gameStateIndicator;
 
     //SpawnManager
     public GameObject[] positions;
 
     // TurnManager
     private int freePosition = 0;
-    private int currentTurn = 1;
-    private string gameState = "CharacterSelecting";
+    public int currentTurn = 1;
+    public string gameState = "CharacterSelecting";
 
     //DeckManager
     private string[] characters = { "Assassin", "Thief", "Bishop", "Magican", "Architect", "Merchant", "Warlord" };
@@ -27,6 +28,7 @@ public class Game_Controller : MonoBehaviour
     public string laidOutPrivate;
     public string laidOutPublic;
     public GameObject charPrefab;
+    private bool deckRendered = false;
 
 
 
@@ -95,24 +97,45 @@ public class Game_Controller : MonoBehaviour
 
     public void renderDeck()
     {
-        for (int i = 0; i < deck.Length; i++)
+        if (!deckRendered)
         {
-            var charCard = InstantiateCharCard(deck[i]);
-            charCard.transform.position += new Vector3(140 * i - ((140 * deck.Length / 2) - 50 - 20), 0, 0);
+            deckRendered = true;
+            var len = deck.Length * 140 - 20;
+            for (int i = 0; i < deck.Length; i++)
+            {
+                var charCard = InstantiateCharCard(deck[i]);
+                charCard.transform.position = new Vector3(-(len / 2) + 140*i + 60, 0, 0);
 
+            }
         }
     }
-    private GameObject InstantiateCharCard(string presetName)
+    public GameObject InstantiateCharCard(string presetName)
     {
         GameObject charCard = Instantiate(charPrefab, transform.position, Quaternion.identity);
 
         // этот кусок кода удалить после написания метода CharacterCard.loadPreset
         var cardScript = charCard.GetComponent<CharacterCard>();
-        var text = cardScript.nameField.GetComponent<Text>();
-        text.text = presetName;
+        cardScript.canvas.GetComponent<Canvas>().worldCamera = camera.GetComponent<Camera>();
 
         cardScript.loadPreset(presetName); // не написано
+        cardScript.controller = this;
+        cardScript.owner = positions[0].GetComponent<Game_Position>().owner;
         return charCard;
+    }
+
+    public void characterSelected()
+    {
+        foreach (var i in GameObject.FindGameObjectsWithTag("CharacterCard"))
+        {
+            Destroy(i);
+        }
+        currentTurn++;
+        if (currentTurn > PhotonNetwork.CurrentRoom.PlayerCount)
+        {
+            currentTurn = 1;
+            gameState = "Coming Soon...";
+            gameStateIndicator.GetComponent<Text>().text = "Coming Soon...";
+        }
     }
 
     public Dictionary<string, string> getCharNames()

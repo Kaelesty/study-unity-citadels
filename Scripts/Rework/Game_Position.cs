@@ -6,6 +6,7 @@ public class Game_Position : MonoBehaviour
 {
     public GameObject activeMarker;
     public GameObject unavtiveMarker;
+    public Player owner;
     public void Activate()
     {
         activeMarker.SetActive(true);
