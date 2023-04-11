@@ -34,6 +34,7 @@ public class CharacterCard : MonoBehaviour
 
     public void OnTaken()
     {
+        Debug.Log("onTaken");
         controller.characterSelected();
         owner.cardSelected(preset);
     }

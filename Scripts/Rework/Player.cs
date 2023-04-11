@@ -1,6 +1,5 @@
 using Photon.Pun;
-using System.Collections;
-using System.Collections.Generic;
+
 using UnityEngine;
 
 public class Player : MonoBehaviourPunCallbacks
@@ -11,6 +10,8 @@ public class Player : MonoBehaviourPunCallbacks
     public GameObject position;
 
     public GameObject character;
+
+    private bool characterSelected = false;
 
     private void Awake()
     {
@@ -40,13 +41,16 @@ public class Player : MonoBehaviourPunCallbacks
         }
         if (controller.checkTurn() == id) {
             position.GetComponent<Game_Position>().Activate();
-            switch (controller.getGameState())
+            if (view.IsMine)
             {
-                case "CharacterSelecting":
-                    controller.renderDeck();
-                    break;
-                case "Coming soon...":
-                    break;
+                switch (controller.getGameState())
+                {
+                    case "CharacterSelecting":
+                        controller.renderDeck();
+                        break;
+                    case "Coming soon...":
+                        break;
+                }
             }
         }
         else
@@ -63,13 +67,27 @@ public class Player : MonoBehaviourPunCallbacks
 
     public void cardSelected(string preset)
     {
+        Debug.Log("cardSelected");
         view.RPC("setCharacter", RpcTarget.All, preset);
     }
 
     [PunRPC]
     private void setCharacter(string preset)
     {
+        Debug.Log("setCharacter");
+        Debug.Log(id);
         character = controller.InstantiateCharCard(preset);
-        character.transform.position = new Vector3(-870, -418, 0);
+        character.tag = "PlayerCharacterCard";
+        character.GetComponent<CharacterCard>().takeButton.SetActive(false);
+        characterSelected = true;
+        if (view.IsMine)
+        {
+            character.transform.position = new Vector3(-870, -418, 0);
+        }
+        else
+        {
+            character.transform.position = position.transform.position + new Vector3(0, -150, 0);
+        }
+
     }
 }

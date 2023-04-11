@@ -57,12 +57,16 @@ public class Game_Controller : MonoBehaviour
     {
         return currentTurn;
     }
+
+    [PunRPC]
     public void nextTurn()
     {
         currentTurn++;
         if (currentTurn > PhotonNetwork.CurrentRoom.PlayerCount)
         {
             currentTurn = 1;
+            gameState = "Coming Soon...";
+            gameStateIndicator.GetComponent<Text>().text = "Coming Soon...";
         }
     }
     public void generateDeck()
@@ -129,13 +133,7 @@ public class Game_Controller : MonoBehaviour
         {
             Destroy(i);
         }
-        currentTurn++;
-        if (currentTurn > PhotonNetwork.CurrentRoom.PlayerCount)
-        {
-            currentTurn = 1;
-            gameState = "Coming Soon...";
-            gameStateIndicator.GetComponent<Text>().text = "Coming Soon...";
-        }
+        view.RPC("nextTurn", RpcTarget.All);
     }
 
     public Dictionary<string, string> getCharNames()
