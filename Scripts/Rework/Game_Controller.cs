@@ -23,12 +23,15 @@ public class Game_Controller : MonoBehaviour
     public string gameState = "CharacterSelecting";
 
     //DeckManager
-    private string[] characters = { "Assassin", "Thief", "Bishop", "Magican", "Architect", "Merchant", "Warlord" };
+    public string[] characters = { "Assassin", "Thief", "Bishop", "Magican", "Architect", "Merchant", "Warlord" };
+    public string[] districts = { "Tavern", "Market", "Trading Post", "Docks", "Harbor", "Town Hall", "Temple", "Church", "Monastery", "Cathedral", "Watchtower", "Prison", "Battlefield", "Fortress", "Manor", "Castle", "Palace", "Haunted", "Keep", "Laboratory", "Smithy", "Graveyard", "Observatory", "School of Magic", "Library", "Great Wall", "University", "Dragon Gate" };
     public string[] deck;
+    public string[] districtDeck;
     public string laidOutPrivate;
     public string laidOutPublic;
     public GameObject charPrefab;
     private bool deckRendered = false;
+    private bool districtDeckRendered = false;
 
 
 
@@ -94,9 +97,16 @@ public class Game_Controller : MonoBehaviour
         deck = deck.Where(e => e != NameCard).ToArray();
     }
 
+    public string takeRandomDistrict() {
+        var district = districtDeck[0];
+        districtDeck = districtDeck.Skip(1).ToArray();
+        return district;
+    }
+
     public void Start()
     {
         generateDeck();
+        generateDistrictDeck();
     }
 
     public void renderDeck()
@@ -113,6 +123,7 @@ public class Game_Controller : MonoBehaviour
             }
         }
     }
+
     public GameObject InstantiateCharCard(string presetName)
     {
         GameObject charCard = Instantiate(charPrefab, transform.position, Quaternion.identity);
@@ -167,5 +178,11 @@ public class Game_Controller : MonoBehaviour
     public string getGameState()
     {
         return gameState;
+    }
+
+    public void generateDistrictDeck()
+    {
+        districtDeck = districts;
+        districtDeck = districtDeck.OrderBy(x => random.Next()).ToArray();
     }
 }

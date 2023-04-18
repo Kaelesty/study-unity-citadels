@@ -1,5 +1,7 @@
 using Photon.Pun;
-
+using System.Collections;
+using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 public class Player : MonoBehaviourPunCallbacks
@@ -10,8 +12,12 @@ public class Player : MonoBehaviourPunCallbacks
     public GameObject position;
 
     public GameObject character;
+    public string[] districts;
 
     private bool characterSelected = false;
+    private bool districtsTaken = false;
+
+    private bool districtsRendered = false;
 
     private void Awake()
     {
@@ -47,6 +53,15 @@ public class Player : MonoBehaviourPunCallbacks
                 {
                     case "CharacterSelecting":
                         controller.renderDeck();
+                        if (!districtsTaken)
+                        {
+                            districtsTaken=true;
+                            for (int i = 0;i<4;i++)
+                            {
+                                districts = districts.Append(controller.takeRandomDistrict()).ToArray();
+                            }
+                        }
+                        renderDistricts();
                         break;
                     case "Coming soon...":
                         break;
@@ -74,8 +89,6 @@ public class Player : MonoBehaviourPunCallbacks
     [PunRPC]
     private void setCharacter(string preset)
     {
-        Debug.Log("setCharacter");
-        Debug.Log(id);
         character = controller.InstantiateCharCard(preset);
         character.tag = "PlayerCharacterCard";
         character.GetComponent<CharacterCard>().takeButton.SetActive(false);
@@ -89,5 +102,23 @@ public class Player : MonoBehaviourPunCallbacks
             character.transform.position = position.transform.position + new Vector3(0, -150, 0);
         }
 
+    }
+
+    private void renderDistricts()
+    {
+        if (districtsRendered)
+        {
+            return;
+        }
+        districtsRendered = true;
+        for (int i = 0;i< districts.Length; i++)
+        {
+            var district = controller.InstantiateCharCard(districts[i]);
+            district.GetComponent<CharacterCard>().takeButton.SetActive(false);
+            district.tag = "PlayerDistrictCard";
+            district.transform.position = new Vector3(860 - 140 * i - 60, -418, 0);
+
+
+        }
     }
 }

@@ -878,6 +878,7 @@ MonoBehaviour:
   currentTurn: 1
   gameState: CharacterSelecting
   deck: []
+  districtDeck: []
   laidOutPrivate: 
   laidOutPublic: 
   charPrefab: {fileID: 7256188863207879379, guid: 5df91eeae3ab48140b0dadf7c847cc27, type: 3}
@@ -2212,9 +2213,9 @@ Camera:
   m_NormalizedViewPortRect:
     serializedVersion: 2
     x: 0
-    y: 0.004206747
+    y: 0.002790153
     width: 1
-    height: 0.9915865
+    height: 0.9944197
   near clip plane: 0.3
   far clip plane: 1000
   field of view: 117
