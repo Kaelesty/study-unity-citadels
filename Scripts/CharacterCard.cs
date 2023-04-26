@@ -41,8 +41,37 @@ public class CharacterCard : MonoBehaviour
 
     public void loadPreset(string presetName)
     {
-        preset = presetName;
-        nameField.GetComponent<Text>().text = presetName;
+        var charNames = deckController.getCharNames();
+        var charDesc = deckController.getCharDesc();
+        if (charNames.ContainsKey(presetName))
+        {
+            nameField.text = charNames[presetName];
+        }
+        if (charDesc.ContainsKey(presetName))
+        {
+            description.text = charDesc[presetName];
+        }
+        imageSlot
+        switch (presetName)
+        {
+            case "King":
+                color = "gold";
+                imageSlot = Resourses.Load<Sprite>("CharacterKing");
+                break;
+            case "Warlord":
+                color = "red";
+                imageSlot = Resourses.Load<Sprite>("CharacterWarlord");
+                break;
+            case "Merchant":
+                color = "green";
+                break;
+            case "Bishop":
+                color = "blue";
+                break;
+            default:
+                color = "white";
+                break;
+        }
         /*
         TO-DO 
         Функция принимает название пресета (персонажа): "Assassin", "Thief", "Bishop", "Magican", "Architect", "Merchant", "Warlord"
