@@ -41,26 +41,24 @@ public class CharacterCard : MonoBehaviour
 
     public void loadPreset(string presetName)
     {
-        var charNames = deckController.getCharNames();
-        var charDesc = deckController.getCharDesc();
+        var charNames = ñontroller.getCharNames();
+        var charDesc = ñontroller.getCharDesc();
         if (charNames.ContainsKey(presetName))
         {
-            nameField.text = charNames[presetName];
+            nameField.GetComponent<Text>() = charNames[presetName];
         }
         if (charDesc.ContainsKey(presetName))
         {
-            description.text = charDesc[presetName];
+            description = charDesc[presetName];
         }
-        imageSlot
+        imageSlot = Resources.Load<Sprite>("Character" + presetName);
         switch (presetName)
         {
             case "King":
                 color = "gold";
-                imageSlot = Resourses.Load<Sprite>("CharacterKing");
                 break;
             case "Warlord":
                 color = "red";
-                imageSlot = Resourses.Load<Sprite>("CharacterWarlord");
                 break;
             case "Merchant":
                 color = "green";
