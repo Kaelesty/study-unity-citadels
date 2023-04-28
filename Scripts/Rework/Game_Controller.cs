@@ -92,9 +92,12 @@ public class Game_Controller : MonoBehaviour
         return deck;
     }
 
-    public void deleteCard(string NameCard)
+    
+
+    [PunRPC]
+    public void deleteCardSync(string cardName)
     {
-        deck = deck.Where(e => e != NameCard).ToArray();
+        deck = deck.Where(e => e != cardName).ToArray();
     }
 
     public string takeRandomDistrict() {
@@ -149,8 +152,9 @@ public class Game_Controller : MonoBehaviour
         return charCard;
     }
 
-    public void characterSelected()
+    public void characterSelected(string cardName)
     {
+        view.RPC("deleteCardSync", RpcTarget.All, cardName);
         foreach (var i in GameObject.FindGameObjectsWithTag("CharacterCard"))
         {
             Destroy(i);

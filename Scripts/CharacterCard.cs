@@ -26,7 +26,7 @@ public class CharacterCard : MonoBehaviour
     public void OnTaken()
     {
         Debug.Log("onTaken");
-        controller.characterSelected();
+        controller.characterSelected(preset);
         owner.cardSelected(preset);
     }
 
