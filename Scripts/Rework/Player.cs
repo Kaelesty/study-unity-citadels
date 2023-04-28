@@ -113,7 +113,7 @@ public class Player : MonoBehaviourPunCallbacks
         districtsRendered = true;
         for (int i = 0;i< districts.Length; i++)
         {
-            var district = controller.InstantiateCharCard(districts[i]);
+            var district = controller.InstantiateDistrictCard(districts[i]);
             district.GetComponent<CharacterCard>().takeButton.SetActive(false);
             district.tag = "PlayerDistrictCard";
             district.transform.position = new Vector3(860 - 140 * i - 60, -418, 0);

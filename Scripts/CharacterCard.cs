@@ -14,23 +14,14 @@ public class CharacterCard : MonoBehaviour
     public GameObject cardObject;
 
     public Game_Controller controller;
-    private string preset;
+    public string preset;
 
 
     public GameObject canvas;
 
     public string description;
     public string color;
-
-    void Start()
-    {
-
-    }
-
-    void Update()
-    {
-
-    }
+    
 
     public void OnTaken()
     {
@@ -41,17 +32,18 @@ public class CharacterCard : MonoBehaviour
 
     public void loadPreset(string presetName)
     {
-        var charNames = сontroller.getCharNames();
-        var charDesc = сontroller.getCharDesc();
+        preset = presetName;
+        var charNames = controller.getCharNames();
+        var charDesc = controller.getCharDesc();
         if (charNames.ContainsKey(presetName))
         {
-            nameField.GetComponent<Text>() = charNames[presetName];
+            nameField.GetComponent<Text>().text = charNames[presetName];
         }
         if (charDesc.ContainsKey(presetName))
         {
             description = charDesc[presetName];
         }
-        imageSlot = Resources.Load<Sprite>("Character" + presetName);
+        imageSlot.GetComponent<Image>().sprite = Resources.Load<Sprite>("Character" + presetName);
         switch (presetName)
         {
             case "King":
@@ -70,15 +62,5 @@ public class CharacterCard : MonoBehaviour
                 color = "white";
                 break;
         }
-        /*
-        TO-DO 
-        Функция принимает название пресета (персонажа): "Assassin", "Thief", "Bishop", "Magican", "Architect", "Merchant", "Warlord"
-        И заполняет поля в соответствии с нужным пресетом:
-        Имя         (нужно записать в nameField) (Получается из словаря deckController.getCharNames())
-        Описание    (нужно сохранить в переменную description) (временно, пока нет элемента интерфейса для этого) (Получается из словаря deckController.getCharDesc())
-        Картинку    (нужно установить в imageSlot) (Заглушки картинок лежат в папке images)
-        Цвет(тип)   (нужно записать в переменную color, временно, пока нет элемента интерфейса для этого) (Цвета персонажей как в игре, gold у короля, red у кондотьера, green у торгаша, blue у епископа, white у остальных)
-
-        */
     }
 }

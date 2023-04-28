@@ -128,13 +128,24 @@ public class Game_Controller : MonoBehaviour
     {
         GameObject charCard = Instantiate(charPrefab, transform.position, Quaternion.identity);
 
-        // этот кусок кода удалить после написания метода CharacterCard.loadPreset
         var cardScript = charCard.GetComponent<CharacterCard>();
         cardScript.canvas.GetComponent<Canvas>().worldCamera = camera.GetComponent<Camera>();
 
-        cardScript.loadPreset(presetName); // не написано
         cardScript.controller = this;
         cardScript.owner = positions[0].GetComponent<Game_Position>().owner;
+
+        cardScript.loadPreset(presetName);
+        return charCard;
+    }
+    public GameObject InstantiateDistrictCard(string presetName)
+    {
+        GameObject charCard = Instantiate(charPrefab, transform.position, Quaternion.identity);
+
+        var cardScript = charCard.GetComponent<CharacterCard>();
+        cardScript.canvas.GetComponent<Canvas>().worldCamera = camera.GetComponent<Camera>();
+        cardScript.controller = this;
+        cardScript.owner = positions[0].GetComponent<Game_Position>().owner;
+        cardScript.nameField.GetComponent<Text>().text = presetName;
         return charCard;
     }
 
