@@ -13,6 +13,10 @@ public class Game_Controller : MonoBehaviour
     public GameObject canvas;
     public GameObject camera;
     public GameObject gameStateIndicator;
+    public GameObject takeMoneyButton;
+    public GameObject moneyIndicator;
+
+    private String[] priorityList = { "Assassin", "Thief", "Magican", "King", "Bishop", "Merchant", "Architect", "Warlord" };
 
     //SpawnManager
     public GameObject[] positions;
@@ -23,13 +27,24 @@ public class Game_Controller : MonoBehaviour
     public string gameState = "CharacterSelecting";
 
     //DeckManager
-    public string[] characters = { "Assassin", "Thief", "Bishop", "Magican", "Architect", "Merchant", "Warlord" };
+    public string[] characters = { "Assassin", "Thief", "Magican", "Bishop", "Architect", "Merchant", "Warlord" };
     public string[] districts = { "Tavern", "Market", "Trading Post", "Docks", "Harbor", "Town Hall", "Temple", "Church", "Monastery", "Cathedral", "Watchtower", "Prison", "Battlefield", "Fortress", "Manor", "Castle", "Palace", "Haunted", "Keep", "Laboratory", "Smithy", "Graveyard", "Observatory", "School of Magic", "Library", "Great Wall", "University", "Dragon Gate" };
-    public string[] deck;
+    public Dictionary<string, int> queue = new Dictionary<string, int>(){
+            { "Assassin", 0},
+            { "Thief", 0},
+            { "Bishop", 0},
+            { "Magican", 0},
+            { "Architect", 0},
+            { "Merchant", 0},
+            { "Warlord", 0},
+            { "King", 0},
+        };
+public string[] deck;
     public string[] districtDeck;
     public string laidOutPrivate;
     public string laidOutPublic;
     public GameObject charPrefab;
+    public GameObject distPrefab;
     private bool deckRendered = false;
     private bool districtDeckRendered = false;
 
@@ -41,8 +56,40 @@ public class Game_Controller : MonoBehaviour
     {
         view = GetComponent<PhotonView>();
     }
+    
+    public int queueFirst()
+    {
+        // возвращает player.id с наивысшим приоритетом хода
+        foreach (String character in priorityList)
+        {
+            if (queue[character] != 0)
+            {
+                return queue[character];
+            }
+        }
+        return -1;
+    }
 
+    [PunRPC]
+    public void queueComeThrough()
+    {
+        // зануляет player.id с наивысшим приоритетом хода
+        // вызывать только через view.RPC
+        foreach (String character in priorityList)
+        {
+            if (queue[character] != 0)
+            {
+                queue[character] = 0;
+            }
+        }
+    }
 
+    [PunRPC]
+    public void queueInterfere(string cardName, int cardOwnerID)
+    {
+        // вызывать только через view.RPC
+        queue[cardName] = cardOwnerID;
+    }
 
     public GameObject getFreePosition()
     {
@@ -64,13 +111,41 @@ public class Game_Controller : MonoBehaviour
     [PunRPC]
     public void nextTurn()
     {
-        currentTurn++;
-        if (currentTurn > PhotonNetwork.CurrentRoom.PlayerCount)
+
+        switch (gameState)
         {
-            currentTurn = 1;
-            gameState = "Coming Soon...";
-            gameStateIndicator.GetComponent<Text>().text = "Coming Soon...";
+            case "CharacterSelecting":
+                currentTurn++;
+                if (currentTurn > PhotonNetwork.CurrentRoom.PlayerCount)
+                {
+                    currentTurn = 1;
+                    gameState = "Major: Resources";
+                    gameStateIndicator.GetComponent<Text>().text = "Major: Resources";
+                }
+                break;
+            case "Major: Resources":
+                gameState = "Major: Building";
+                gameStateIndicator.GetComponent<Text>().text = "Major: Building";
+                renderResourcesUI(false);
+                break;
         }
+    }
+
+    public void renderResourcesUI(bool activity)
+    {
+        //Debug.Log("renderResourcesUI");
+        takeMoneyButton.SetActive(activity);
+
+        if (activity)
+        {
+            for (int i = 0; i < 2; i++)
+            {
+                var card = InstantiateDistrictCard(takeRandomDistrict());
+                card.tag = "PlayerDistrictCard";
+                card.transform.position = new Vector3(-(260 / 2) + 140 * i + 60, 0, 0);
+            }
+        }
+
     }
     public void generateDeck()
     {
@@ -95,15 +170,33 @@ public class Game_Controller : MonoBehaviour
     
 
     [PunRPC]
-    public void deleteCardSync(string cardName)
+    private void deleteCardSync(string cardName)
     {
+        // вызывать только через view.RPC
         deck = deck.Where(e => e != cardName).ToArray();
     }
 
     public string takeRandomDistrict() {
         var district = districtDeck[0];
-        districtDeck = districtDeck.Skip(1).ToArray();
+        view.RPC("takeRandomDistrictSync", RpcTarget.All);
         return district;
+    }
+
+    [PunRPC]
+    private void takeRandomDistrictSync()
+    {
+        districtDeck = districtDeck.Skip(1).ToArray();
+    }
+
+    public void addToDistrictDeck(String preset)
+    {
+        view.RPC("addToDistrictDeckSync", RpcTarget.All, preset);
+    }
+
+    [PunRPC]
+    private void addToDistrictDeckSync(String preset)
+    {
+        districtDeck = districtDeck.Append(preset).ToArray();
     }
 
     public void Start()
@@ -142,25 +235,47 @@ public class Game_Controller : MonoBehaviour
     }
     public GameObject InstantiateDistrictCard(string presetName)
     {
-        GameObject charCard = Instantiate(charPrefab, transform.position, Quaternion.identity);
+        GameObject charCard = Instantiate(distPrefab, transform.position, Quaternion.identity);
 
-        var cardScript = charCard.GetComponent<CharacterCard>();
+        var cardScript = charCard.GetComponent<DistrictCard>();
         cardScript.canvas.GetComponent<Canvas>().worldCamera = camera.GetComponent<Camera>();
         cardScript.controller = this;
+        cardScript.preset = presetName;
         cardScript.owner = positions[0].GetComponent<Game_Position>().owner;
         cardScript.nameField.GetComponent<Text>().text = presetName;
         return charCard;
     }
 
-    public void characterSelected(string cardName)
+    public void takeMoney()
+    {
+        var playerID = queueFirst();
+        foreach (GameObject position in positions)
+        {
+            if (position.GetComponent<Game_Position>().owner.id == playerID)
+            {
+                position.GetComponent<Game_Position>().owner.addMoney(2);
+                break;
+            }
+        }
+        view.RPC("nextTurn", RpcTarget.All);
+    }
+
+    public void updateMoneyIndicator(int amount) 
+    {
+        moneyIndicator.GetComponent<Text>().text = "Money: " + amount.ToString();
+    }
+
+    public void characterSelected(string cardName, int cardOwnerID)
     {
         view.RPC("deleteCardSync", RpcTarget.All, cardName);
+        view.RPC("queueInterfere", RpcTarget.All, cardName, cardOwnerID);
         foreach (var i in GameObject.FindGameObjectsWithTag("CharacterCard"))
         {
             Destroy(i);
         }
         view.RPC("nextTurn", RpcTarget.All);
     }
+
 
     public Dictionary<string, string> getCharNames()
     {
@@ -200,4 +315,5 @@ public class Game_Controller : MonoBehaviour
         districtDeck = districts;
         districtDeck = districtDeck.OrderBy(x => random.Next()).ToArray();
     }
+
 }

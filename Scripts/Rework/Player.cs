@@ -11,13 +11,15 @@ public class Player : MonoBehaviourPunCallbacks
     public int id;
     public GameObject position;
 
+    public int money;
+
     public GameObject character;
     public string[] districts;
 
     private bool characterSelected = false;
     private bool districtsTaken = false;
-
     private bool districtsRendered = false;
+    private bool resourcesRendered = false;
 
     private void Awake()
     {
@@ -63,7 +65,11 @@ public class Player : MonoBehaviourPunCallbacks
                         }
                         renderDistricts();
                         break;
-                    case "Coming soon...":
+                    case "Major: Resources":
+                        if (!resourcesRendered) {
+                            controller.renderResourcesUI(true);
+                            resourcesRendered=true;
+                        }
                         break;
                 }
             }
@@ -80,9 +86,21 @@ public class Player : MonoBehaviourPunCallbacks
         id = nuID;
     }
 
+    public void addMoney(int amount)
+    {
+        controller.updateMoneyIndicator(amount);
+        view.RPC("addMoneySync", RpcTarget.All, amount);
+    }
+
+    [PunRPC]
+    public void addMoneySync(int amount)
+    {
+        money += amount;
+    }
+
     public void cardSelected(string preset)
     {
-        Debug.Log("cardSelected");
+        
         view.RPC("setCharacter", RpcTarget.All, preset);
     }
 
@@ -110,15 +128,36 @@ public class Player : MonoBehaviourPunCallbacks
         {
             return;
         }
+        //Debug.Log("RenderDistricts");
+        foreach (var i in GameObject.FindGameObjectsWithTag("PlayerDistrictCard"))
+        {
+            Destroy(i);
+        }
+
         districtsRendered = true;
+        //Debug.Log(districts.Length);
         for (int i = 0;i< districts.Length; i++)
         {
             var district = controller.InstantiateDistrictCard(districts[i]);
-            district.GetComponent<CharacterCard>().takeButton.SetActive(false);
+            district.GetComponent<DistrictCard>().takeButton.SetActive(false);
             district.tag = "PlayerDistrictCard";
             district.transform.position = new Vector3(860 - 140 * i - 60, -418, 0);
 
 
         }
+    }
+
+    public void addToDistricts(string district)
+    {
+        //Debug.Log("AddToDistricts: " + id.ToString() + " // " + district);
+        view.RPC("AddToDistrictsSync", RpcTarget.All, district);
+        renderDistricts();
+    }
+
+    [PunRPC]
+    private void AddToDistrictsSync(string district)
+    {
+        districts = districts.Append(district).ToArray();
+        districtsRendered = false;
     }
 }

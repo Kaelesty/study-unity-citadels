@@ -69,5 +69,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   id: 0
   position: {fileID: 0}
+  money: 0
   character: {fileID: 0}
   districts: []
