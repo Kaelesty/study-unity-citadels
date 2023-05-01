@@ -108,6 +108,11 @@ public string[] deck;
         return currentTurn;
     }
 
+    public void callNextTurn()
+    {
+        view.RPC("nextTurn", RpcTarget.All);
+    }
+
     [PunRPC]
     public void nextTurn()
     {
@@ -128,6 +133,26 @@ public string[] deck;
                 gameStateIndicator.GetComponent<Text>().text = "Major: Building";
                 renderResourcesUI(false);
                 break;
+            case "Major: Building":
+                //gameState = "Major: Skills";
+                //gameStateIndicator.GetComponent<Text>().text = "Major: Skills";
+
+                // Этот кусок кода перенести в case "Major: Skills", когда он будет готов
+                currentTurn++;
+                if (currentTurn > PhotonNetwork.CurrentRoom.PlayerCount)
+                {
+                    currentTurn = 1;
+                    foreach (var i in GameObject.FindGameObjectsWithTag("Player"))
+                    {
+                        i.GetComponent<Player>().resetRenderedFlags();
+                    }
+                }
+                gameState = "Major: Resources";
+                gameStateIndicator.GetComponent<Text>().text = "Major: Resources";
+                break;
+            case "Major: Skills":
+                // Оставлено до лучших времен
+                break;
         }
     }
 
@@ -141,8 +166,15 @@ public string[] deck;
             for (int i = 0; i < 2; i++)
             {
                 var card = InstantiateDistrictCard(takeRandomDistrict());
-                card.tag = "PlayerDistrictCard";
+                card.tag = "DistrictCard";
                 card.transform.position = new Vector3(-(260 / 2) + 140 * i + 60, 0, 0);
+            }
+        }
+        else
+        {
+            foreach (var i in GameObject.FindGameObjectsWithTag("DistrictCard"))
+            {
+                Destroy(i);
             }
         }
 

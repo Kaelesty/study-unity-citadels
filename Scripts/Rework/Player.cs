@@ -7,7 +7,7 @@ using UnityEngine;
 public class Player : MonoBehaviourPunCallbacks
 {
     PhotonView view;
-    private Game_Controller controller;
+    public Game_Controller controller;
     public int id;
     public GameObject position;
 
@@ -15,17 +15,22 @@ public class Player : MonoBehaviourPunCallbacks
 
     public GameObject character;
     public string[] districts;
+    public string[] buildedDistricts;
 
+    // Логика на флагах выглядит ущербно, нужно переделать -_-
     private bool characterSelected = false;
     private bool districtsTaken = false;
     private bool districtsRendered = false;
-    private bool resourcesRendered = false;
+    public bool resourcesRendered = false;
+    private bool buildingRendered = false;
+    private bool skillsRendered = false;
+    private bool endgameRendered = false;
 
     private void Awake()
     {
         view = GetComponent<PhotonView>();
         controller = GameObject.Find("Controller").GetComponent<Game_Controller>();
-
+        gameObject.tag = "Player";
         if (view.IsMine)
         {
             id = PhotonNetwork.LocalPlayer.ActorNumber;
@@ -39,6 +44,34 @@ public class Player : MonoBehaviourPunCallbacks
         position.GetComponent<Game_Position>().owner = this;
         transform.position = new Vector3(0, 0, 0);
 
+    }
+
+    public void buildDistrict(string preset)
+    {
+        view.RPC("buildDistrictSync", RpcTarget.All, preset);
+    }
+
+    // Из-за особенностей RPC происходит дублирование методов
+    // TODO: придумать, как это убрать
+    public void resetRenderedFlags()
+    {
+        view.RPC("resetRenderedFlagsSync", RpcTarget.All);
+    }
+
+    [PunRPC]
+    public void resetRenderedFlagsSync()
+    {
+        districtsRendered = false;
+        resourcesRendered = false;
+        buildingRendered = false;
+        skillsRendered = false;
+        endgameRendered = false;
+    }
+
+    [PunRPC]
+    private void buildDistrictSync(string preset)
+    {
+        buildedDistricts = buildedDistricts.Append(preset).ToArray();
     }
 
     private void Update()
@@ -71,12 +104,28 @@ public class Player : MonoBehaviourPunCallbacks
                             resourcesRendered=true;
                         }
                         break;
+                    case "Major: Building":
+                        controller.renderResourcesUI(false);
+                        renderBuildingUI();
+                        break;
                 }
             }
         }
         else
         {
             position.GetComponent<Game_Position>().Unactivate();
+        }
+    }
+
+    private void renderBuildingUI()
+    {
+        if (!buildingRendered)
+        {
+            buildingRendered=true;
+            foreach (var i in GameObject.FindGameObjectsWithTag("PlayerDistrictCard"))
+            {
+                i.GetComponent<DistrictCard>().activateBuilding();
+            }
         }
     }
 
@@ -122,13 +171,14 @@ public class Player : MonoBehaviourPunCallbacks
 
     }
 
-    private void renderDistricts()
+    public void renderDistricts(bool force=false)
     {
-        if (districtsRendered)
+        if (districtsRendered && !force)
         {
+            Debug.Log("RenderDistricts Abadoned");
             return;
         }
-        //Debug.Log("RenderDistricts");
+        Debug.Log("RenderDistricts");
         foreach (var i in GameObject.FindGameObjectsWithTag("PlayerDistrictCard"))
         {
             Destroy(i);
@@ -139,9 +189,14 @@ public class Player : MonoBehaviourPunCallbacks
         for (int i = 0;i< districts.Length; i++)
         {
             var district = controller.InstantiateDistrictCard(districts[i]);
-            district.GetComponent<DistrictCard>().takeButton.SetActive(false);
+            var script = district.GetComponent<DistrictCard>();
+            script.buildButton.SetActive(false);
+            script.takeButton.SetActive(false);
             district.tag = "PlayerDistrictCard";
             district.transform.position = new Vector3(860 - 140 * i - 60, -418, 0);
+            if (buildedDistricts.Contains(districts[i])) {
+                script.buildedButton.SetActive(true);
+            }
 
 
         }

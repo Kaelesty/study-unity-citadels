@@ -67,8 +67,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 678a56d8694208442a4dbc319311f23a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  controller: {fileID: 0}
   id: 0
   position: {fileID: 0}
   money: 0
   character: {fileID: 0}
   districts: []
+  buildedDistricts: []
+  resourcesRendered: 0
