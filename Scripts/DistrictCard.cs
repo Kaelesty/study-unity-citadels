@@ -23,6 +23,7 @@ public class DistrictCard : MonoBehaviour
 
     public string description;
     public string color;
+    public int price;
 
     public bool isBuilded = false;
 
@@ -38,6 +39,28 @@ public class DistrictCard : MonoBehaviour
     public void loadPreset(string presetName)
     {
         // TODO : аналогично с CharacterCard.loadPreset...
+        var distName = controller.getCharNames();
+        var distColor = controller.getCharDesc();
+        var distPrice = controller.getCharDesc();
+        var distDesc = controller.getCharDesc();
+
+        preset = presetName;
+        if (distName.ContainsKey(presetName))
+        {
+            nameField.GetComponent<Text>().text = distName[presetName];
+        }
+        if (distColor.ContainsKey(presetName))
+        {
+            color = distColor[presetName];
+        }
+        if (distPrice.ContainsKey(presetName))
+        {
+            price = distPrice[presetName];
+        }
+        if (distDesc.ContainsKey(presetName))
+        {
+            description = distDesc[presetName];
+        }
     }
 
     public void activateBuilding()
