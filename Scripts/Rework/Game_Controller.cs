@@ -348,7 +348,7 @@ public string[] deck;
         districtDeck = districtDeck.OrderBy(x => random.Next()).ToArray();
     }
 
-    public Dictionary<string, string> getDistColor()
+    public Dictionary<string, string> getDistName()
     {
         return new Dictionary<string, string>() {
     {"Tavern", "Таверна"},
