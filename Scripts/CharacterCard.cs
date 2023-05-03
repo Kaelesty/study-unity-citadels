@@ -48,7 +48,7 @@ public class CharacterCard : MonoBehaviour
         switch (presetName)
         {
             case "King":
-                color = "gold";
+                color = "yellow";
                 break;
             case "Warlord":
                 color = "red";
