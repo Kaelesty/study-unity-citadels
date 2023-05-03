@@ -12,6 +12,7 @@ public class CharacterCard : MonoBehaviour
     public Player owner;
     public CharacterCard script;
     public GameObject cardObject;
+    public GameObject descField;
 
     public Game_Controller controller;
     public string preset;
