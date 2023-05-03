@@ -39,7 +39,7 @@ public class Game_Controller : MonoBehaviour
             { "Warlord", 0},
             { "King", 0},
         };
-public string[] deck;
+    public string[] deck;
     public string[] districtDeck;
     public string laidOutPrivate;
     public string laidOutPublic;
@@ -64,6 +64,8 @@ public string[] deck;
         {
             if (queue[character] != 0)
             {
+                Debug.Log(character);
+                Debug.Log(queue[character]);
                 return queue[character];
             }
         }
@@ -116,14 +118,18 @@ public string[] deck;
     [PunRPC]
     public void nextTurn()
     {
-
+        // Тут есть баг
+        // После Major: Resources независимо от очереди выбрасывает в CharacterSelecting
+        // Баг надо исправить
+        // %_%
         switch (gameState)
         {
             case "CharacterSelecting":
                 currentTurn++;
                 if (currentTurn > PhotonNetwork.CurrentRoom.PlayerCount)
                 {
-                    currentTurn = 1;
+                    currentTurn = queueFirst();
+                    view.RPC("queueComeThrough", RpcTarget.All);
                     gameState = "Major: Resources";
                     gameStateIndicator.GetComponent<Text>().text = "Major: Resources";
                 }
@@ -138,21 +144,36 @@ public string[] deck;
                 //gameStateIndicator.GetComponent<Text>().text = "Major: Skills";
 
                 // Этот кусок кода перенести в case "Major: Skills", когда он будет готов
-                currentTurn++;
-                if (currentTurn > PhotonNetwork.CurrentRoom.PlayerCount)
+                currentTurn = queueFirst();
+                view.RPC("queueComeThrough", RpcTarget.All);
+                if (currentTurn != -1)
                 {
-                    currentTurn = 1;
-                    foreach (var i in GameObject.FindGameObjectsWithTag("Player"))
-                    {
-                        i.GetComponent<Player>().resetRenderedFlags();
-                    }
+                    // Debug.Log("");
+                    gameState = "Major: Resources";
+                    
                 }
-                gameState = "Major: Resources";
-                gameStateIndicator.GetComponent<Text>().text = "Major: Resources";
+                else
+                {
+                    gameState = "CharacterSelecting";
+                    currentTurn = 1;
+                    characterSelectingInit();
+                    // сюда дописать проверку на конец игры
+                }
                 break;
             case "Major: Skills":
                 // Оставлено до лучших времен
                 break;
+        }
+    }
+
+    public void characterSelectingInit()
+    {
+        gameStateIndicator.GetComponent<Text>().text = "CharacterSelecting";
+        foreach (GameObject player in GameObject.FindGameObjectsWithTag("Player"))
+        {
+            player.GetComponent<Player>().resetCharacter();
+            generateDeck();
+            deckRendered = false;
         }
     }
 
@@ -180,6 +201,12 @@ public string[] deck;
 
     }
     public void generateDeck()
+    {
+        view.RPC("generateDeckSync", RpcTarget.All);
+    }
+
+    [PunRPC]
+    private void generateDeckSync()
     {
         deck = characters;
         deck = deck.OrderBy(x => random.Next()).ToArray();
@@ -274,7 +301,7 @@ public string[] deck;
         cardScript.controller = this;
         cardScript.preset = presetName;
         cardScript.owner = positions[0].GetComponent<Game_Position>().owner;
-        cardScript.nameField.GetComponent<Text>().text = presetName;
+        cardScript.loadPreset(presetName);
         return charCard;
     }
 
@@ -300,6 +327,7 @@ public string[] deck;
     public void characterSelected(string cardName, int cardOwnerID)
     {
         view.RPC("deleteCardSync", RpcTarget.All, cardName);
+        Debug.Log("Queue interfere");
         view.RPC("queueInterfere", RpcTarget.All, cardName, cardOwnerID);
         foreach (var i in GameObject.FindGameObjectsWithTag("CharacterCard"))
         {

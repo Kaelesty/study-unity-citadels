@@ -129,6 +129,21 @@ public class Player : MonoBehaviourPunCallbacks
         }
     }
 
+    public void resetCharacter()
+    {
+        view.RPC("resetCharacterSync", RpcTarget.All);
+        var charCard = GameObject.FindGameObjectWithTag("PlayerCharacterCard");
+        Destroy(charCard);
+        resetRenderedFlags();
+    }
+
+    [PunRPC]
+    private void resetCharacterSync()
+    {
+        character = null;
+        characterSelected = false;
+    }
+
     [PunRPC]
     private void idSync(int nuID)
     {
@@ -175,7 +190,7 @@ public class Player : MonoBehaviourPunCallbacks
     {
         if (districtsRendered && !force)
         {
-            Debug.Log("RenderDistricts Abadoned");
+            //Debug.Log("RenderDistricts Abadoned");
             return;
         }
         Debug.Log("RenderDistricts");

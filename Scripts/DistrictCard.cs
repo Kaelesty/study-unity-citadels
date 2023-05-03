@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class DistrictCard : MonoBehaviour
 {
@@ -39,10 +40,10 @@ public class DistrictCard : MonoBehaviour
     public void loadPreset(string presetName)
     {
         // TODO : аналогично с CharacterCard.loadPreset...
-        var distName = controller.getCharNames();
-        var distColor = controller.getCharDesc();
-        var distPrice = controller.getCharDesc();
-        var distDesc = controller.getCharDesc();
+        var distName = controller.getDistName();
+        var distColor = controller.getDistDesc();
+        var distPrice = controller.getDistPrice();
+        var distDesc = controller.getDistDesc();
 
         preset = presetName;
         if (distName.ContainsKey(presetName))
