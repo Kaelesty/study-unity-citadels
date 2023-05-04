@@ -82,6 +82,7 @@ public class Game_Controller : MonoBehaviour
             if (queue[character] != 0)
             {
                 queue[character] = 0;
+                break;
             }
         }
     }
@@ -122,6 +123,10 @@ public class Game_Controller : MonoBehaviour
         // После Major: Resources независимо от очереди выбрасывает в CharacterSelecting
         // Баг надо исправить
         // %_%
+        foreach (var unit in characters)
+        {
+            Debug.Log(unit + " - " + queue[unit]);
+        }
         switch (gameState)
         {
             case "CharacterSelecting":
@@ -129,7 +134,7 @@ public class Game_Controller : MonoBehaviour
                 if (currentTurn > PhotonNetwork.CurrentRoom.PlayerCount)
                 {
                     currentTurn = queueFirst();
-                    view.RPC("queueComeThrough", RpcTarget.All);
+                    //view.RPC("queueComeThrough", RpcTarget.All);
                     gameState = "Major: Resources";
                     gameStateIndicator.GetComponent<Text>().text = "Major: Resources";
                 }
@@ -144,8 +149,9 @@ public class Game_Controller : MonoBehaviour
                 //gameStateIndicator.GetComponent<Text>().text = "Major: Skills";
 
                 // Этот кусок кода перенести в case "Major: Skills", когда он будет готов
-                currentTurn = queueFirst();
                 view.RPC("queueComeThrough", RpcTarget.All);
+                currentTurn = queueFirst();
+                
                 if (currentTurn != -1)
                 {
                     // Debug.Log("");
