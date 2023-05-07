@@ -66,9 +66,9 @@ public class DistrictCard : MonoBehaviour
         }
     }
 
-    public void activateBuilding()
+    public void activateBuilding(bool activity)
     {
-        buildButton.SetActive(true);
+        buildButton.SetActive(activity);
     }
 
     public void onBuild()

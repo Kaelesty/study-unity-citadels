@@ -138,18 +138,19 @@ public class Game_Controller : MonoBehaviour
                 renderResourcesUI(false);
                 break;
             case "Major: Building":
-                //gameState = "Major: Skills";
-                //gameStateIndicator.GetComponent<Text>().text = "Major: Skills";
-
-                // Этот кусок кода перенести в case "Major: Skills", когда он будет готов
+                gameState = "Major: Skills";
+                gameStateIndicator.GetComponent<Text>().text = "Major: Skills";
+                handleSkills();
+                break;
+            case "Major: Skills":
                 view.RPC("queueComeThrough", RpcTarget.All);
                 currentTurn = queueFirst();
-                
+
                 if (currentTurn != -1)
                 {
                     // Debug.Log("");
                     gameState = "Major: Resources";
-                    
+
                 }
                 else
                 {
@@ -159,8 +160,25 @@ public class Game_Controller : MonoBehaviour
                     // сюда дописать проверку на конец игры
                 }
                 break;
-            case "Major: Skills":
-                // Оставлено до лучших времен
+        }
+    }
+
+    private void handleSkills ()
+    {
+        Player activePlayer = null;
+        foreach (var i in GameObject.FindGameObjectsWithTag("Player"))
+        {
+            if (i.GetComponent<Player>().id == queueFirst())
+            {
+                activePlayer = i.GetComponent<Player>();
+                break;
+            }
+        }
+        switch (activePlayer.characterPreset)
+        {
+            case "Bishop":
+                break;
+            case "Merchant":
                 break;
         }
     }
@@ -180,7 +198,7 @@ public class Game_Controller : MonoBehaviour
     public void switchSkipping(bool skipping)
     {
         skipButton.SetActive(skipping);
-        Debug.Log(skipping);
+        // Debug.Log(skipping);
     }
 
     public void renderResourcesUI(bool activity)

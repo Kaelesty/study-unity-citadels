@@ -1,4 +1,5 @@
 using Photon.Pun;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
@@ -14,6 +15,7 @@ public class Player : MonoBehaviourPunCallbacks
     public int money;
 
     public GameObject character;
+    public String characterPreset;
     public string[] districts;
     public string[] buildedDistricts;
 
@@ -111,7 +113,10 @@ public class Player : MonoBehaviourPunCallbacks
                         break;
                     case "Major: Building":
                         controller.renderResourcesUI(false);
-                        renderBuildingUI();
+                        renderBuildingUI(true);
+                        break;
+                    case "Major: Skills":
+                        renderBuildingUI(false);
                         break;
                 }
             }
@@ -122,18 +127,18 @@ public class Player : MonoBehaviourPunCallbacks
         }
     }
 
-    private void renderBuildingUI()
+    private void renderBuildingUI(bool activity)
     {
-        if (!buildingRendered)
+        if (!buildingRendered || !activity)
         {
-            buildingRendered=true;
+            buildingRendered=!activity;
             controller.switchSkipping(true);
-            Debug.Log("Skipping activated");
+            // Debug.Log("Skipping switched");
             foreach (var i in GameObject.FindGameObjectsWithTag("PlayerDistrictCard"))
             {
-                if (i.GetComponent<DistrictCard>().price <= money)
+                if (i.GetComponent<DistrictCard>().price <= money || !activity)
                 {
-                    i.GetComponent<DistrictCard>().activateBuilding();
+                    i.GetComponent<DistrictCard>().activateBuilding(activity);
                 }
             }
         }
@@ -193,7 +198,7 @@ public class Player : MonoBehaviourPunCallbacks
         {
             character.transform.position = position.transform.position + new Vector3(0, -150, 0);
         }
-
+        characterPreset = preset;
     }
 
     public void renderDistricts(bool force=false)
