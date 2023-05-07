@@ -46,10 +46,7 @@ public class DistrictCard : MonoBehaviour
         var distDesc = controller.getDistDesc();
 
         preset = presetName;
-        if (distName.ContainsKey(presetName))
-        {
-            nameField.GetComponent<Text>().text = distName[presetName];
-        }
+        
         if (distColor.ContainsKey(presetName))
         {
             color = distColor[presetName];
@@ -61,6 +58,11 @@ public class DistrictCard : MonoBehaviour
         if (distDesc.ContainsKey(presetName))
         {
             description = distDesc[presetName];
+        }
+        if (distName.ContainsKey(presetName))
+        {
+            // цена временно выводится в поле названия
+            nameField.GetComponent<Text>().text = distName[presetName] + " " + price.ToString();
         }
     }
 

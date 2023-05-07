@@ -15,6 +15,7 @@ public class Game_Controller : MonoBehaviour
     public GameObject gameStateIndicator;
     public GameObject takeMoneyButton;
     public GameObject moneyIndicator;
+    public GameObject skipButton;
 
     private String[] priorityList = { "Assassin", "Thief", "Magican", "King", "Bishop", "Merchant", "Architect", "Warlord" };
 
@@ -64,8 +65,8 @@ public class Game_Controller : MonoBehaviour
         {
             if (queue[character] != 0)
             {
-                Debug.Log(character);
-                Debug.Log(queue[character]);
+                //Debug.Log(character);
+                //Debug.Log(queue[character]);
                 return queue[character];
             }
         }
@@ -119,14 +120,6 @@ public class Game_Controller : MonoBehaviour
     [PunRPC]
     public void nextTurn()
     {
-        // Тут есть баг
-        // После Major: Resources независимо от очереди выбрасывает в CharacterSelecting
-        // Баг надо исправить
-        // %_%
-        foreach (var unit in characters)
-        {
-            Debug.Log(unit + " - " + queue[unit]);
-        }
         switch (gameState)
         {
             case "CharacterSelecting":
@@ -175,6 +168,7 @@ public class Game_Controller : MonoBehaviour
     public void characterSelectingInit()
     {
         gameStateIndicator.GetComponent<Text>().text = "CharacterSelecting";
+        switchSkipping(false);
         foreach (GameObject player in GameObject.FindGameObjectsWithTag("Player"))
         {
             player.GetComponent<Player>().resetCharacter();
@@ -183,13 +177,20 @@ public class Game_Controller : MonoBehaviour
         }
     }
 
+    public void switchSkipping(bool skipping)
+    {
+        skipButton.SetActive(skipping);
+        Debug.Log(skipping);
+    }
+
     public void renderResourcesUI(bool activity)
     {
         //Debug.Log("renderResourcesUI");
         takeMoneyButton.SetActive(activity);
-
+        
         if (activity)
         {
+            switchSkipping(false);
             for (int i = 0; i < 2; i++)
             {
                 var card = InstantiateDistrictCard(takeRandomDistrict());
@@ -333,7 +334,7 @@ public class Game_Controller : MonoBehaviour
     public void characterSelected(string cardName, int cardOwnerID)
     {
         view.RPC("deleteCardSync", RpcTarget.All, cardName);
-        Debug.Log("Queue interfere");
+        // Debug.Log("Queue interfere");
         view.RPC("queueInterfere", RpcTarget.All, cardName, cardOwnerID);
         foreach (var i in GameObject.FindGameObjectsWithTag("CharacterCard"))
         {

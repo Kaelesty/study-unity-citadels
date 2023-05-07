@@ -51,6 +51,15 @@ public class Player : MonoBehaviourPunCallbacks
         view.RPC("buildDistrictSync", RpcTarget.All, preset);
     }
 
+    [PunRPC]
+    private void buildDistrictSync(string preset)
+    {
+        // Debug.Log("BuildDistrictSync");
+        buildedDistricts = buildedDistricts.Append(preset).ToArray();
+        money -= controller.getDistPrice()[preset];
+        controller.updateMoneyIndicator(money);
+    }
+
     // Из-за особенностей RPC происходит дублирование методов
     // TODO: придумать, как это убрать
     public void resetRenderedFlags()
@@ -68,11 +77,7 @@ public class Player : MonoBehaviourPunCallbacks
         endgameRendered = false;
     }
 
-    [PunRPC]
-    private void buildDistrictSync(string preset)
-    {
-        buildedDistricts = buildedDistricts.Append(preset).ToArray();
-    }
+    
 
     private void Update()
     {
@@ -122,9 +127,14 @@ public class Player : MonoBehaviourPunCallbacks
         if (!buildingRendered)
         {
             buildingRendered=true;
+            controller.switchSkipping(true);
+            Debug.Log("Skipping activated");
             foreach (var i in GameObject.FindGameObjectsWithTag("PlayerDistrictCard"))
             {
-                i.GetComponent<DistrictCard>().activateBuilding();
+                if (i.GetComponent<DistrictCard>().price <= money)
+                {
+                    i.GetComponent<DistrictCard>().activateBuilding();
+                }
             }
         }
     }
@@ -152,8 +162,8 @@ public class Player : MonoBehaviourPunCallbacks
 
     public void addMoney(int amount)
     {
-        controller.updateMoneyIndicator(amount);
         view.RPC("addMoneySync", RpcTarget.All, amount);
+        controller.updateMoneyIndicator(money);
     }
 
     [PunRPC]
