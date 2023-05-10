@@ -16,6 +16,9 @@ public class Game_Controller : MonoBehaviour
     public GameObject takeMoneyButton;
     public GameObject moneyIndicator;
     public GameObject skipButton;
+    public GameObject endgameIndicator;
+    public GameObject endgameMessage;
+    public GameObject endgameBackground;
 
     private String[] priorityList = { "Assassin", "Thief", "Magican", "King", "Bishop", "Merchant", "Architect", "Warlord" };
 
@@ -154,15 +157,38 @@ public class Game_Controller : MonoBehaviour
                 }
                 else
                 {
-                    gameState = "CharacterSelecting";
-                    currentTurn = 1;
-                    characterSelectingInit();
-                    // сюда дописать проверку на конец игры
+                    if (!checkEndgame())
+                    {
+                        gameState = "CharacterSelecting";
+                        currentTurn = 1;
+                        characterSelectingInit();
+                    }
                 }
                 break;
         }
     }
 
+    private bool checkEndgame()
+    {
+        foreach (var i in GameObject.FindGameObjectsWithTag("Player"))
+        {
+            if (i.GetComponent<Player>().buildedDistricts.Length == 8)
+            {
+                renderEndgame(i.GetComponent<Player>().id);
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private void renderEndgame(int id)
+    {
+        endgameBackground.SetActive(true);
+        endgameMessage.SetActive(true);
+        endgameIndicator.SetActive(true);
+        switchSkipping(false);
+        endgameMessage.GetComponent<Text>().text = "Winner: " + id.ToString();
+    }
     private void handleSkills ()
     {
         Player activePlayer = null;
