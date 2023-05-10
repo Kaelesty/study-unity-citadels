@@ -20,7 +20,7 @@ public class Game_Controller : MonoBehaviour
     public GameObject endgameMessage;
     public GameObject endgameBackground;
 
-    private String[] priorityList = { "Assassin", "Thief", "Magican", "King", "Bishop", "Merchant", "Architect", "Warlord" };
+    private String[] priorityList = { "Assassin", "Thief", "Magician", "King", "Bishop", "Merchant", "Architect", "Warlord" };
 
     //SpawnManager
     public GameObject[] positions;
@@ -31,13 +31,13 @@ public class Game_Controller : MonoBehaviour
     public string gameState = "CharacterSelecting";
 
     //DeckManager
-    public string[] characters = { "Assassin", "Thief", "Magican", "Bishop", "Architect", "Merchant", "Warlord" };
+    public string[] characters = { "Assassin", "Thief", "Magician", "Bishop", "Architect", "Merchant", "Warlord" };
     public string[] districts = { "Tavern", "Market", "Trading Post", "Docks", "Harbor", "Town Hall", "Temple", "Church", "Monastery", "Cathedral", "Watchtower", "Prison", "Battlefield", "Fortress", "Manor", "Castle", "Palace", "Haunted", "Keep", "Laboratory", "Smithy", "Graveyard", "Observatory", "School of Magic", "Library", "Great Wall", "University", "Dragon Gate" };
     public Dictionary<string, int> queue = new Dictionary<string, int>(){
             { "Assassin", 0},
             { "Thief", 0},
             { "Bishop", 0},
-            { "Magican", 0},
+            { "Magician", 0},
             { "Architect", 0},
             { "Merchant", 0},
             { "Warlord", 0},
