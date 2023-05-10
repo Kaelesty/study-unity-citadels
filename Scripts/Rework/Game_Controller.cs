@@ -320,11 +320,11 @@ public class Game_Controller : MonoBehaviour
         if (!deckRendered)
         {
             deckRendered = true;
-            var len = deck.Length * 140 - 20;
+            var len = deck.Length * 200 - 20;
             for (int i = 0; i < deck.Length; i++)
             {
                 var charCard = InstantiateCharCard(deck[i]);
-                charCard.transform.position = new Vector3(-(len / 2) + 140*i + 60, 0, 0);
+                charCard.transform.position = new Vector3(-(len / 2) + 200*i + 60, 0, 0);
 
             }
         }

@@ -72,6 +72,7 @@ MonoBehaviour:
   position: {fileID: 0}
   money: 0
   character: {fileID: 0}
+  characterPreset: 
   districts: []
   buildedDistricts: []
   resourcesRendered: 0

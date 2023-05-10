@@ -192,7 +192,7 @@ public class Player : MonoBehaviourPunCallbacks
         characterSelected = true;
         if (view.IsMine)
         {
-            character.transform.position = new Vector3(-870, -418, 0);
+            character.transform.position = new Vector3(-850, -418, 0);
         }
         else
         {
@@ -216,19 +216,36 @@ public class Player : MonoBehaviourPunCallbacks
 
         districtsRendered = true;
         //Debug.Log(districts.Length);
+        string[] lowerDistricts = { };
+        string[] upperDistricts = { };
         for (int i = 0;i< districts.Length; i++)
         {
-            var district = controller.InstantiateDistrictCard(districts[i]);
+            if (buildedDistricts.Contains(districts[i])) {
+                upperDistricts = upperDistricts.Append(districts[i]).ToArray();
+            }
+            else
+            {
+                lowerDistricts = lowerDistricts.Append(districts[i]).ToArray();
+            }
+        }
+        for (int i =0;i< lowerDistricts.Length;i++)
+        {
+            var district = controller.InstantiateDistrictCard(lowerDistricts[i]);
             var script = district.GetComponent<DistrictCard>();
             script.buildButton.SetActive(false);
             script.takeButton.SetActive(false);
             district.tag = "PlayerDistrictCard";
-            district.transform.position = new Vector3(860 - 140 * i - 60, -418, 0);
-            if (buildedDistricts.Contains(districts[i])) {
-                script.buildedButton.SetActive(true);
-            }
-
-
+            district.transform.position = new Vector3(860 - 170 * i - 60, -390, 0);
+        }
+        for (int i = 0; i < upperDistricts.Length; i++)
+        {
+            var district = controller.InstantiateDistrictCard(upperDistricts[i]);
+            var script = district.GetComponent<DistrictCard>();
+            script.buildButton.SetActive(false);
+            script.takeButton.SetActive(false);
+            district.tag = "PlayerDistrictCard";
+            district.transform.position = new Vector3(860 - 170 * i - 60, -100, 0);
+            script.buildedButton.SetActive(true);
         }
     }
 
