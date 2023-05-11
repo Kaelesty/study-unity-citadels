@@ -205,7 +205,7 @@ public class Game_Controller : MonoBehaviour
             case "Bishop":
                 for (int i = 0; i <= activePlayer.buildedDistricts.Length; i++)
                 {
-                    if (controller.getDistColor() == "blue")
+                    if (getDistColor(activePlayer.buildedDistricts[i]) == "blue")
                     {
                         activePlayer.addMoney(1);
                     }
@@ -215,7 +215,7 @@ public class Game_Controller : MonoBehaviour
                 activePlayer.addMoney(1);
                 for (int i = 0; i <= activePlayer.buildedDistricts.Length; i++)
                 {
-                    if (controller.getDistColor() == "green")
+                    if (getDistColor(activePlayer.buildedDistricts[i]) == "green")
                     {
                         activePlayer.addMoney(1);
                     }
@@ -228,7 +228,7 @@ public class Game_Controller : MonoBehaviour
             case "King":
                 for (int i = 0; i <= activePlayer.buildedDistricts.Length; i++)
                 {
-                    if (controller.getDistColor() == "yellow")
+                    if (getDistColor(activePlayer.buildedDistricts[i]) == "yellow")
                     {
                         activePlayer.addMoney(1);
                     }
@@ -241,7 +241,7 @@ public class Game_Controller : MonoBehaviour
             case "Warlord":
                 for (int i = 0; i <= activePlayer.buildedDistricts.Length; i++)
                 {
-                    if (controller.getDistColor() == "red")
+                    if (getDistColor(activePlayer.buildedDistricts[i]) == "red")
                     {
                         activePlayer.addMoney(1);
                     }
