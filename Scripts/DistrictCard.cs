@@ -41,7 +41,7 @@ public class DistrictCard : MonoBehaviour
     {
         // TODO : аналогично с CharacterCard.loadPreset...
         var distName = controller.getDistName();
-        var distColor = controller.getDistDesc();
+        var distColor = controller.getDistColor();
         var distPrice = controller.getDistPrice();
         var distDesc = controller.getDistDesc();
 

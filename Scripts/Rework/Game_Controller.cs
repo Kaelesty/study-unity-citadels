@@ -203,8 +203,49 @@ public class Game_Controller : MonoBehaviour
         switch (activePlayer.characterPreset)
         {
             case "Bishop":
+                for (int i = 0; i <= activePlayer.buildedDistricts.Length; i++)
+                {
+                    if (controller.getDistColor() == "blue")
+                    {
+                        activePlayer.addMoney(1);
+                    }
+                }
                 break;
             case "Merchant":
+                activePlayer.addMoney(1);
+                for (int i = 0; i <= activePlayer.buildedDistricts.Length; i++)
+                {
+                    if (controller.getDistColor() == "green")
+                    {
+                        activePlayer.addMoney(1);
+                    }
+                }
+                break;
+            case "Architect":
+                break;
+            case "Assasin":
+                break;
+            case "King":
+                for (int i = 0; i <= activePlayer.buildedDistricts.Length; i++)
+                {
+                    if (controller.getDistColor() == "yellow")
+                    {
+                        activePlayer.addMoney(1);
+                    }
+                }
+                break;
+            case "Magician":
+                break;
+            case "Thief":
+                break;
+            case "Warlord":
+                for (int i = 0; i <= activePlayer.buildedDistricts.Length; i++)
+                {
+                    if (controller.getDistColor() == "red")
+                    {
+                        activePlayer.addMoney(1);
+                    }
+                }
                 break;
         }
     }
