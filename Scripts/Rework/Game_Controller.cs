@@ -205,47 +205,55 @@ public class Game_Controller : MonoBehaviour
             case "Bishop":
                 for (int i = 0; i <= activePlayer.buildedDistricts.Length; i++)
                 {
-                    if (getDistColor(activePlayer.buildedDistricts[i]) == "blue")
+                    if (getDistColor()[activePlayer.buildedDistricts[i]) == "blue"]
                     {
                         activePlayer.addMoney(1);
                     }
                 }
+                nextTurn();
                 break;
             case "Merchant":
                 activePlayer.addMoney(1);
                 for (int i = 0; i <= activePlayer.buildedDistricts.Length; i++)
                 {
-                    if (getDistColor(activePlayer.buildedDistricts[i]) == "green")
+                    if (getDistColor()[activePlayer.buildedDistricts[i]) == "green"]
                     {
                         activePlayer.addMoney(1);
                     }
                 }
+                nextTurn();
                 break;
             case "Architect":
+                nextTurn();
                 break;
             case "Assasin":
+                nextTurn();
                 break;
             case "King":
                 for (int i = 0; i <= activePlayer.buildedDistricts.Length; i++)
                 {
-                    if (getDistColor(activePlayer.buildedDistricts[i]) == "yellow")
+                    if (getDistColor()[activePlayer.buildedDistricts[i]) == "yellow"]
                     {
                         activePlayer.addMoney(1);
                     }
                 }
+                nextTurn();
                 break;
             case "Magician":
+                nextTurn();
                 break;
             case "Thief":
+                nextTurn();
                 break;
             case "Warlord":
                 for (int i = 0; i <= activePlayer.buildedDistricts.Length; i++)
                 {
-                    if (getDistColor(activePlayer.buildedDistricts[i]) == "red")
+                    if (getDistColor()[activePlayer.buildedDistricts[i]) == "red"]
                     {
                         activePlayer.addMoney(1);
                     }
                 }
+                nextTurn();
                 break;
         }
     }
