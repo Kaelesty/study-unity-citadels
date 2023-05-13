@@ -27,8 +27,8 @@ public class CharacterCard : MonoBehaviour
     public void OnTaken()
     {
         // Debug.Log("onTaken");
-        controller.characterSelected(preset, owner.id);
         owner.cardSelected(preset);
+        controller.characterSelected(preset, owner.id);
     }
 
     public void loadPreset(string presetName)

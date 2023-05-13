@@ -112,8 +112,19 @@ public class Player : MonoBehaviourPunCallbacks
                         }
                         break;
                     case "Major: Building":
-                        controller.renderResourcesUI(false);
-                        renderBuildingUI(true);
+                        if (controller.assassinMarker == id && controller.currentTurn == id)
+                        {
+                            Debug.Log("Assassin's prey");
+                            controller.assassinMarker = 0;
+                            controller.switchGameState("Major: Building");
+                            controller.callNextTurn();
+                            controller.switchSkipping(false);
+                        }
+                        else
+                        {
+                            controller.renderResourcesUI(false);
+                            renderBuildingUI(true);
+                        }
                         break;
                     case "Major: Skills":
                         renderBuildingUI(false);
@@ -175,6 +186,22 @@ public class Player : MonoBehaviourPunCallbacks
     public void addMoneySync(int amount)
     {
         money += amount;
+    }
+
+    public void playerRenderAssassinUI()
+    {
+        if (controller.currentTurn == id && view.IsMine)
+        {
+            controller.renderAssassinUI(true);
+        }
+    }
+
+    public void playerSwitchSkipping()
+    {
+        if (controller.currentTurn == id && view.IsMine)
+        {
+            controller.switchSkipping(true);
+        }
     }
 
     public void cardSelected(string preset)

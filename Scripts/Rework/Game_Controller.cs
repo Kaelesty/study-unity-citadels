@@ -19,6 +19,7 @@ public class Game_Controller : MonoBehaviour
     public GameObject endgameIndicator;
     public GameObject endgameMessage;
     public GameObject endgameBackground;
+    public GameObject selector;
 
     private String[] priorityList = { "Assassin", "Thief", "Magician", "King", "Bishop", "Merchant", "Architect", "Warlord" };
 
@@ -51,6 +52,8 @@ public class Game_Controller : MonoBehaviour
     public GameObject distPrefab;
     private bool deckRendered = false;
     private bool districtDeckRendered = false;
+    private bool assassinUIrendered = false;
+    public int assassinMarker = 0;
 
 
 
@@ -131,29 +134,25 @@ public class Game_Controller : MonoBehaviour
                 {
                     currentTurn = queueFirst();
                     //view.RPC("queueComeThrough", RpcTarget.All);
-                    gameState = "Major: Resources";
-                    gameStateIndicator.GetComponent<Text>().text = "Major: Resources";
+                    gameState = "Major: Skills";
+                    gameStateIndicator.GetComponent<Text>().text = "Major: Skills";
+                    handleSkills();
                 }
                 break;
             case "Major: Resources":
                 gameState = "Major: Building";
+                playerSwitchSkipping();
                 gameStateIndicator.GetComponent<Text>().text = "Major: Building";
                 renderResourcesUI(false);
                 break;
             case "Major: Building":
-                gameState = "Major: Skills";
-                gameStateIndicator.GetComponent<Text>().text = "Major: Skills";
-                handleSkills();
-                break;
-            case "Major: Skills":
                 view.RPC("queueComeThrough", RpcTarget.All);
                 currentTurn = queueFirst();
-
                 if (currentTurn != -1)
                 {
-                    // Debug.Log("");
-                    gameState = "Major: Resources";
-
+                    gameState = "Major: Skills";
+                    gameStateIndicator.GetComponent<Text>().text = "Major: Skills";
+                    handleSkills();
                 }
                 else
                 {
@@ -164,6 +163,23 @@ public class Game_Controller : MonoBehaviour
                         characterSelectingInit();
                     }
                 }
+                break;
+            case "Major: Skills":
+                if (assassinUIrendered)
+                {
+                    var dropdown = selector.GetComponent<Dropdown>();
+                    foreach (GameObject i in GameObject.FindGameObjectsWithTag("Player"))
+                    {
+                        var prey = getCharNames()[i.GetComponent<Player>().characterPreset];
+                        if (prey == dropdown.options[dropdown.value].text)
+                        {
+                            assassinMarker = i.GetComponent<Player>().id;
+                        }
+                    }
+                    renderAssassinUI(false);
+                }
+                gameState = "Major: Resources";
+                gameStateIndicator.GetComponent<Text>().text = "Major: Resources";
                 break;
         }
     }
@@ -181,6 +197,25 @@ public class Game_Controller : MonoBehaviour
         return false;
     }
 
+    public void playerSwitchSkipping()
+    {
+        foreach (GameObject player in GameObject.FindGameObjectsWithTag("Player"))
+        {
+            player.GetComponent<Player>().playerSwitchSkipping();
+        }
+    }
+
+    public void switchGameState(String gs)
+    {
+        view.RPC("switchGameStateSync", RpcTarget.All, gs);
+    }
+
+    [PunRPC]
+    private void switchGameStateSync(String gs)
+    {
+        gameState = gs;
+    }
+
     private void renderEndgame(int id)
     {
         endgameBackground.SetActive(true);
@@ -191,8 +226,9 @@ public class Game_Controller : MonoBehaviour
     }
     private void handleSkills ()
     {
+        // Debug.Log("Handle skills");
         Player activePlayer = null;
-        foreach (var i in GameObject.FindGameObjectsWithTag("Player"))
+        foreach (GameObject i in GameObject.FindGameObjectsWithTag("Player"))
         {
             if (i.GetComponent<Player>().id == queueFirst())
             {
@@ -210,7 +246,7 @@ public class Game_Controller : MonoBehaviour
                         activePlayer.addMoney(1);
                     }
                 }
-                nextTurn();
+                callNextTurn();
                 break;
             case "Merchant":
                 activePlayer.addMoney(1);
@@ -221,13 +257,13 @@ public class Game_Controller : MonoBehaviour
                         activePlayer.addMoney(1);
                     }
                 }
-                nextTurn();
+                callNextTurn();
                 break;
             case "Architect":
-                nextTurn();
+                callNextTurn();
                 break;
-            case "Assasin":
-                nextTurn();
+            case "Assassin":
+                playerRenderAssassinUI();
                 break;
             case "King":
                 for (int i = 0; i < activePlayer.buildedDistricts.Length; i++)
@@ -237,13 +273,13 @@ public class Game_Controller : MonoBehaviour
                         activePlayer.addMoney(1);
                     }
                 }
-                nextTurn();
+                callNextTurn();
                 break;
             case "Magician":
-                nextTurn();
+                callNextTurn();
                 break;
             case "Thief":
-                nextTurn();
+                callNextTurn();
                 break;
             case "Warlord":
                 for (int i = 0; i < activePlayer.buildedDistricts.Length; i++)
@@ -253,7 +289,7 @@ public class Game_Controller : MonoBehaviour
                         activePlayer.addMoney(1);
                     }
                 }
-                nextTurn();
+                callNextTurn();
                 break;
         }
     }
@@ -268,6 +304,48 @@ public class Game_Controller : MonoBehaviour
             generateDeck();
             deckRendered = false;
         }
+    }
+
+    public void playerRenderAssassinUI()
+    {
+        foreach (GameObject player in GameObject.FindGameObjectsWithTag("Player"))
+        {
+            player.GetComponent<Player>().playerRenderAssassinUI();
+        }
+    }
+
+    public void renderAssassinUI(bool activity)
+    {
+            selector.SetActive(activity);
+            assassinUIrendered = activity;
+            // Debug.Log("Assassin UI");
+            if (activity)
+            {
+                playerSwitchSkipping();
+                selector.GetComponent<Dropdown>().ClearOptions();
+                foreach (String i in characters)
+                {
+                    if (i == "Assassin")
+                    {
+                        continue;
+                    }
+                    var option = new Dropdown.OptionData();
+                    option.text = getCharNames()[i];
+                    selector.GetComponent<Dropdown>().options.Add(option);
+                }
+                var noneOption = new Dropdown.OptionData();
+                noneOption.text = "<------->";
+                selector.GetComponent<Dropdown>().options.Add(noneOption);
+                noneOption = new Dropdown.OptionData();
+                noneOption.text = "<------->";
+                selector.GetComponent<Dropdown>().options.Add(noneOption);
+                selector.GetComponent<Dropdown>().RefreshShownValue();
+            }
+            else
+            {
+            switchSkipping(false);
+                assassinUIrendered = false;
+            }
     }
 
     public void switchSkipping(bool skipping)
