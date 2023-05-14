@@ -20,6 +20,6 @@ public class GameManager : MonoBehaviourPunCallbacks
     }
 
     public override void OnJoinedRoom() {
-        PhotonNetwork.LoadLevel("GameRework");
+        PhotonNetwork.LoadLevel("GameRework2");
     }
 }

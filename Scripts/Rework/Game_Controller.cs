@@ -140,6 +140,7 @@ public class Game_Controller : MonoBehaviour
                 }
                 break;
             case "Major: Resources":
+                Debug.Log("Resources -> Building");
                 gameState = "Major: Building";
                 playerSwitchSkipping();
                 gameStateIndicator.GetComponent<Text>().text = "Major: Building";
@@ -174,10 +175,12 @@ public class Game_Controller : MonoBehaviour
                         if (prey == dropdown.options[dropdown.value].text)
                         {
                             assassinMarker = i.GetComponent<Player>().id;
+                            break;
                         }
                     }
                     renderAssassinUI(false);
                 }
+                Debug.Log("Skills -> Resources");
                 gameState = "Major: Resources";
                 gameStateIndicator.GetComponent<Text>().text = "Major: Resources";
                 break;
@@ -296,6 +299,7 @@ public class Game_Controller : MonoBehaviour
 
     public void characterSelectingInit()
     {
+        view.RPC("resetCharacters", RpcTarget.All);
         gameStateIndicator.GetComponent<Text>().text = "CharacterSelecting";
         switchSkipping(false);
         foreach (GameObject player in GameObject.FindGameObjectsWithTag("Player"))
@@ -303,6 +307,15 @@ public class Game_Controller : MonoBehaviour
             player.GetComponent<Player>().resetCharacter();
             generateDeck();
             deckRendered = false;
+        }
+    }
+
+    [PunRPC]
+    public void resetCharacters()
+    {
+        foreach (GameObject player in GameObject.FindGameObjectsWithTag("Player"))
+        {
+            player.GetComponent<Player>().resetCharacter();
         }
     }
 
@@ -343,7 +356,7 @@ public class Game_Controller : MonoBehaviour
             }
             else
             {
-            switchSkipping(false);
+                switchSkipping(false);
                 assassinUIrendered = false;
             }
     }
@@ -403,8 +416,6 @@ public class Game_Controller : MonoBehaviour
     {
         return deck;
     }
-
-    
 
     [PunRPC]
     private void deleteCardSync(string cardName)
