@@ -30,7 +30,17 @@ public class ScreenManager : MonoBehaviour
     {
         screenSelector.SetActive(true);
         var dropdown = screenSelector.GetComponent<Dropdown>();
-        var screenPosition = screens[dropdown.options[dropdown.value].text];
+        switchScreen(dropdown.options[dropdown.value].text);
+    }
+
+    public void switchScreen(string screenName)
+    {
+        var screenPosition = screens[screenName];
         camera.transform.LeanMoveLocal(new Vector3(screenPosition[0], screenPosition[1], (float)-325.4922), 2).setEaseInCubic();
+    }
+
+    public void enableSelector()
+    {
+        screenSelector.SetActive(true);
     }
 }

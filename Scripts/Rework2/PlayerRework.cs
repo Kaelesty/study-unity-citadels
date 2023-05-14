@@ -8,6 +8,7 @@ public class PlayerRework : MonoBehaviourPunCallbacks
 {
     PhotonView view;
     public int id;
+    public string nickname;
 
     private void Awake()
     {
@@ -24,5 +25,21 @@ public class PlayerRework : MonoBehaviourPunCallbacks
     private void setID(int newID)
     {
         id = newID;
+    }
+
+    public void callSetNickname(string nickname)
+    {
+        view.RPC("setNickname", RpcTarget.All, nickname);
+    }
+
+    [PunRPC]
+    private void setNickname(string newNickname)
+    {
+        nickname = newNickname;
+    }
+
+    public bool checkView()
+    {
+        return view.IsMine;
     }
 }
