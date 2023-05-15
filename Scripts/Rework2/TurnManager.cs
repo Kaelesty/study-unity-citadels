@@ -8,11 +8,65 @@ public class TurnManager : MonoBehaviourPunCallbacks
     PhotonView view;
     private int[] queue = null;
 
+    public GameObject endTurnButton;
+
+    private int stage = 0;
+    // 0 - выбор персонажей, 1 - основной
+    // (Относительно GameRework) 1 - объединение всех Major этапов
+
+    private int currentQueueIndex = 0;
+
     private string[] characters = { "Assassin", "Thief", "Magician", "King", "Bishop", "Merchant", "Architect", "Warlord" };
 
     private void Awake()
     {
         view = GetComponent<PhotonView>();
+    }
+
+    public void callInit()
+    {
+        view.RPC("nit", RpcTarget.All);
+    }
+
+    [PunRPC]
+    public void init()
+    {
+        callRefillQueueByPlayerID();
+        var csm = GameObject.FindGameObjectWithTag("CSM");
+        if (csm.GetComponent<CharacterScreenManager>().turn(queue[0], stage))
+        {
+            // endTurnButton.SetActive(true);
+        }
+    }
+
+    public void callEndTurn()
+    {
+        view.RPC("endTurn", RpcTarget.All);
+    }
+
+    [PunRPC]
+    private void endTurn()
+    {
+        currentQueueIndex++;
+        var csm = GameObject.FindGameObjectWithTag("CSM");
+        if (currentQueueIndex == queue.Length)
+        {
+            if (stage == 0)
+            {
+                stage = 1;
+                refillQueueByCharacters();
+            }
+            else
+            {
+                stage = 0;
+                refillQueueByPlayerID(); // заменить на Seating, когда он будет готов
+            }
+            csm.GetComponent<CharacterScreenManager>().turn(queue[0], stage);
+        }
+        else
+        {
+            csm.GetComponent<CharacterScreenManager>().turn(queue[currentQueueIndex], stage);
+        }
     }
 
     public void callRefillQueueByPlayerID()
@@ -36,7 +90,7 @@ public class TurnManager : MonoBehaviourPunCallbacks
         queue = new int[PhotonNetwork.CurrentRoom.PlayerCount];
         for (int i = 0; i < PhotonNetwork.CurrentRoom.PlayerCount;i++)
         {
-            queue[i] = i;
+            queue[i] = i + 1;
         }
     }
 

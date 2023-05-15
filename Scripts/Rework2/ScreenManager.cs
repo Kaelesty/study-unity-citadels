@@ -20,6 +20,10 @@ public class ScreenManager : MonoBehaviour
         dropdown.ClearOptions();
         foreach (var screen in screens.Keys)
         {
+            if (screen == "Connecting")
+            {
+                continue;
+            }
             var option = new Dropdown.OptionData();
             option.text = screen;
             dropdown.options.Add(option);
@@ -36,7 +40,11 @@ public class ScreenManager : MonoBehaviour
     public void switchScreen(string screenName)
     {
         var screenPosition = screens[screenName];
-        camera.transform.LeanMoveLocal(new Vector3(screenPosition[0], screenPosition[1], (float)-325.4922), 2).setEaseInCubic();
+        camera.transform.LeanMoveLocal(new Vector3(screenPosition[0], screenPosition[1], (float)-325.4922), 2).setEaseInCubic().setOnComplete(
+            delegate()
+            {
+                if (screenName == "CharacterSelecting") { enableSelector(); }
+            });
     }
 
     public void enableSelector()

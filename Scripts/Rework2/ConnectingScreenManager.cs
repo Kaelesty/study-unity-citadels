@@ -66,7 +66,7 @@ public class ConnectingScreenManager : MonoBehaviourPunCallbacks
     }
 
     [PunRPC]
-    private void addNicknameLabel(string nickname)
+    public void addNicknameLabel(string nickname)
     {
         var awaitingState = awaitingMenu.active;
         awaitingMenu.SetActive(true);
@@ -87,6 +87,8 @@ public class ConnectingScreenManager : MonoBehaviourPunCallbacks
     {
         var sm = screenManager.GetComponent<ScreenManager>();
         sm.switchScreen("CharacterSelecting");
-        sm.enableSelector();
+
+        var tm = GameObject.FindGameObjectWithTag("TurnManager").GetComponent<TurnManager>();
+        tm.init();
     }
 }

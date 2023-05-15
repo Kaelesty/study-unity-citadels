@@ -475,8 +475,8 @@ public class Game_Controller : MonoBehaviour
         var cardScript = charCard.GetComponent<CharacterCard>();
         cardScript.canvas.GetComponent<Canvas>().worldCamera = camera.GetComponent<Camera>();
 
-        cardScript.controller = this;
-        cardScript.owner = positions[0].GetComponent<Game_Position>().owner;
+        //cardScript.controller = this;
+        //cardScript.owner = positions[0].GetComponent<Game_Position>().owner;
 
         cardScript.loadPreset(presetName);
         return charCard;

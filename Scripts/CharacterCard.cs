@@ -8,13 +8,9 @@ public class CharacterCard : MonoBehaviour
     public GameObject nameField;
     public GameObject takeButton;
     public GameObject imageSlot;
-
-    public Player owner;
     public CharacterCard script;
     public GameObject cardObject;
-    public GameObject descField;
 
-    public Game_Controller controller;
     public string preset;
 
 
@@ -22,27 +18,32 @@ public class CharacterCard : MonoBehaviour
 
     public string description;
     public string color;
-    
+
+    Dictionary<string, string> charNames = new Dictionary<string, string>() {
+            { "Assassin", "Ассассин"},
+            { "Thief", "Вор"},
+            { "Bishop", "Епископ"},
+            { "Magician", "Чародей"},
+            { "Architect", "Зодчий"},
+            { "Merchant", "Купец"},
+            { "Warlord", "Кондотьер"},
+            { "King", "Король"},
+        };
+
 
     public void OnTaken()
     {
         // Debug.Log("onTaken");
-        owner.cardSelected(preset);
-        controller.characterSelected(preset, owner.id);
+        var csm = GameObject.FindGameObjectWithTag("CSM").GetComponent<CharacterScreenManager>();
+        csm.cardTaken(cardObject);
     }
 
     public void loadPreset(string presetName)
     {
         preset = presetName;
-        var charNames = controller.getCharNames();
-        var charDesc = controller.getCharDesc();
         if (charNames.ContainsKey(presetName))
         {
             nameField.GetComponent<Text>().text = charNames[presetName];
-        }
-        if (charDesc.ContainsKey(presetName))
-        {
-            description = charDesc[presetName];
         }
         imageSlot.GetComponent<Image>().sprite = Resources.Load<Sprite>("Character" + presetName);
         switch (presetName)

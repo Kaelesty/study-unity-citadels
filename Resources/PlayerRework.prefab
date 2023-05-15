@@ -47,6 +47,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   id: 0
   nickname: 
+  character: 
 --- !u!114 &6910778313287793776
 MonoBehaviour:
   m_ObjectHideFlags: 0
