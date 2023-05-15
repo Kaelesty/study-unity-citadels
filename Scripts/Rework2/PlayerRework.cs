@@ -9,6 +9,7 @@ public class PlayerRework : MonoBehaviourPunCallbacks
     PhotonView view;
     public int id;
     public string nickname;
+    public string character;
 
     private void Awake()
     {
