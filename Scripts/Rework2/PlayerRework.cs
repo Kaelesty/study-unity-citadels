@@ -90,6 +90,16 @@ public class PlayerRework : MonoBehaviourPunCallbacks
         view.RPC("increaseBalance", RpcTarget.All, amount);
     }
 
+    public void callBuildDistrict(string preset)
+    {
+        view.RPC("buildDistrict", RpcTarget.All, preset);
+    }
+
+    public void callDeleteDistrict(string preset)
+    {
+        view.RPC("deleteDistrict", RpcTarget.All, preset);
+    }
+
     [PunRPC]
     private void increaseBalance(int amount)
     {
@@ -111,5 +121,17 @@ public class PlayerRework : MonoBehaviourPunCallbacks
     private void addDistrict(string preset)
     {
         districts.Add(preset);
+    }
+
+    [PunRPC]
+    private void buildDistrict(string preset)
+    {
+        buildedDistricts.Add(preset);
+    }
+
+    [PunRPC]
+    private void deleteDistrict(string preset)
+    {
+        districts.Remove(preset);
     }
 }

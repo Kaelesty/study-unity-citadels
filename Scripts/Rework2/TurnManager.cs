@@ -49,19 +49,23 @@ public class TurnManager : MonoBehaviourPunCallbacks
     {
         currentQueueIndex++;
         var csm = GameObject.FindGameObjectWithTag("CSM");
-        if (currentQueueIndex == queue.Length)
+        var dm = GameObject.FindGameObjectWithTag("DeckManager");
+        if (currentQueueIndex >= queue.Length)
         {
             if (stage == 0)
             {
                 stage = 1;
                 refillQueueByCharacters();
+                csm.GetComponent<CharacterScreenManager>().turn(queue[0], stage);
             }
             else
             {
                 stage = 0;
+                dm.GetComponent<DeckManager>().callGenerateDeck();
                 refillQueueByPlayerID(); // заменить на Seating, когда он будет готов
+                csm.GetComponent<CharacterScreenManager>().resetCharacterAndTurn(queue[0], stage);
             }
-            csm.GetComponent<CharacterScreenManager>().turn(queue[0], stage);
+            
         }
         else
         {

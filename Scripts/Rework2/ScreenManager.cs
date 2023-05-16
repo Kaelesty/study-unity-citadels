@@ -41,7 +41,7 @@ public class ScreenManager : MonoBehaviour
     public void switchScreen(string screenName)
     {
         var screenPosition = screens[screenName];
-        camera.transform.LeanMoveLocal(new Vector3(screenPosition[0], screenPosition[1], (float)-325.4922), 1).setEaseInCubic().setOnComplete(
+        camera.transform.LeanMoveLocal(new Vector3(screenPosition[0], screenPosition[1], (float)-325.4922), 2).setEaseInCubic().setOnComplete(
             delegate()
             {
                 if (screenName == "Меню: Персонаж") { enableUI(); }

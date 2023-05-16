@@ -152,11 +152,7 @@ public class DistrictCard : MonoBehaviour
 
     public void onBuild()
     {
-        buildButton.SetActive(false);
-        buildedButton.SetActive(true);
-        isBuilded = true;
-        owner.buildDistrict(preset);
-        owner.renderDistricts(true);
-        owner.controller.callNextTurn();
+        var cmm = GameObject.FindGameObjectWithTag("CMM").GetComponent<CitadelMenuManager>();
+        cmm.distCardBuild(cardObject);
     }
 }

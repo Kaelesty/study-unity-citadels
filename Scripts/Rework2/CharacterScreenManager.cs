@@ -73,7 +73,7 @@ public class CharacterScreenManager : MonoBehaviour
         cmm.updatePlayerDistricts(master.districts);
     }
 
-    private GameObject getMasterPlayer()
+    public GameObject getMasterPlayer()
     {
         foreach (GameObject player in GameObject.FindGameObjectsWithTag("Player"))
         {
@@ -85,9 +85,19 @@ public class CharacterScreenManager : MonoBehaviour
         throw new MissingComponentException();
     }
 
-    public bool turn(int id, int stage)
+    public bool turn(int id, int stage, bool callFromCharReset=false)
     {
         var master = getMasterPlayer().GetComponent<PlayerRework>();
+        if (callFromCharReset)
+        {
+            var resourcesMenu = GameObject.FindGameObjectWithTag("ResourcesMenu");
+            resourcesMenu.transform.LeanScale(new Vector3(0f, 0f, 1), 1).setEaseOutCubic();
+            resourcesMenuHeader.GetComponent<Text>().text = "Выберите карту";
+            resourcesMenu.transform.LeanScale(new Vector3(0f, 0f, 1), 0);
+
+            var description = GameObject.FindGameObjectWithTag("Description");
+            description.transform.LeanScale(new Vector3(0f, 0f, 1), 0);
+        }
         if (master.checkView() && master.id == id) {
 
             gamestateIndicator.GetComponent<Text>().text = "Твой ход!";
@@ -95,27 +105,56 @@ public class CharacterScreenManager : MonoBehaviour
             {
                 LeanTween.cancel(characterMenu);
                 characterMenu.transform.rotation = Quaternion.identity;
-                characterMenu.transform.LeanScale(new Vector3(1f, 1f), 1).setEaseInCubic().setOnComplete(
+                endTurnButton.SetActive(false);
+                characterMenu.transform.LeanMove(new Vector3(2000, 0, characterMenu.transform.position.z), 1).setEaseInOutCubic().setOnComplete(
                     delegate ()
                     {
-                        characterMenuHeader.SetActive(true);
-                        createCharacterVariants();
-                    }
-                    );
+                        characterMenu.transform.LeanScale(new Vector3(1f, 1f), 1).setEaseInCubic().setOnComplete(
+                            delegate ()
+                            {
+                                characterMenuHeader.SetActive(true);
+                                createCharacterVariants();
+                            }
+                            );
+                    });
             }
             else
             {
                 createResourcesVariants();
                 endTurnButton.SetActive(true);
+
+                foreach (GameObject card in GameObject.FindGameObjectsWithTag("PlayerDistrictCard"))
+                {
+                    card.GetComponent<DistrictCard>().buildButton.SetActive(true);
+                }
             }
             return true;
         }
         else
         {
             gamestateIndicator.GetComponent<Text>().text = "Ожидание хода...";
-
+            if (view.IsMine && callFromCharReset)
+            {
+                characterMenu.transform.LeanMove(new Vector3(2000, 0, characterMenu.transform.position.z), 1).setEaseInOutCubic();
+                characterMenuHeader.SetActive(false);
+                characterMenu.transform.LeanScale(new Vector3(0.06f, 0.12f), 0);
+                characterMenu.transform.LeanRotateAroundLocal(new Vector3(0, 0, 180), 360, 3).setEaseInCubic().setLoopPingPong();
+            }
         }
         return false;
+    }
+
+    public void resetCharacterAndTurn(int id, int stage)
+    {
+        var character = GameObject.FindGameObjectWithTag("PlayerCharacterCard");
+        character.transform.LeanScale(new Vector3(0f, 0f, 0f), 1).setEaseOutCubic().setOnComplete(
+            delegate ()
+            {
+                Destroy(character);
+                var master = getMasterPlayer().GetComponent<PlayerRework>();
+                master.callSetCharacter("");
+                turn(id, stage, true);
+            });
     }
 
     private void createCharacterVariants()
@@ -282,11 +321,10 @@ public class CharacterScreenManager : MonoBehaviour
                                 delegate()
                                 {
                                     cardObject.GetComponent<DistrictCard>().takeButton.SetActive(false);
-                                    cardObject.GetComponent<DistrictCard>().buildButton.SetActive(false);
+                                    cardObject.GetComponent<DistrictCard>().buildButton.SetActive(true);
                                     cardObject.transform.LeanScale(new Vector3(1.2f, 1.2f, 1), 0);
                                     createSkillsMenu();
                                 });
-                            // Пока нет экрана цитадели, карта просто улетает за экран
                         });
                     }
                 });
@@ -322,7 +360,7 @@ public class CharacterScreenManager : MonoBehaviour
                             }
                         }
                         master.callIncreaseBalance(newBalance);
-                        text = "Пассивная способность:\n★ +2 золотой\n★ +1 золотой за каждый зеленый район";
+                        text = "Пассивная способность:\n★ +1 золотой\n★ +1 золотой за каждый зеленый район";
                         break;
                     case "Bishop":
                         newBalance = 0;
@@ -345,7 +383,7 @@ public class CharacterScreenManager : MonoBehaviour
                             var cardObject = InstantiateDistrictCard(card);
                             cardObject.tag = "PlayerDistrictCard";
                             cardObject.GetComponent<DistrictCard>().takeButton.SetActive(false);
-                            cardObject.GetComponent<DistrictCard>().buildButton.SetActive(false);
+                            cardObject.GetComponent<DistrictCard>().buildButton.SetActive(true);
                             cardObject.transform.LeanScale(new Vector3(1.2f, 1.2f, 1), 0);
                             int y = -320;
                             int x = 3200 + 140 * (master.districts.Count - 1);
@@ -366,7 +404,7 @@ public class CharacterScreenManager : MonoBehaviour
                         text = "Активная способность:\n★ Выберите игрока и его район, который будет разрушен\n(Меню шпионажа)";
                         break;
                     case "Magician":
-                        text = "Активная способность:\n★ Выберите игрока, с которым вы обменяетесь картами районов\nИЛИ Сбросьте свои карты в колоду и получите столько же новых";
+                        text = "Активная способность:\n★ Выберите игрока, с которым вы обменяетесь картами районов\nИЛИ Сбросьте свои карты в колоду и\n получите столько же новых";
                         break;
                 }
                 var description = GameObject.FindGameObjectWithTag("Description");
