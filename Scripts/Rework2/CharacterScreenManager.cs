@@ -91,13 +91,21 @@ public class CharacterScreenManager : MonoBehaviour
     {
         var deckManager = GameObject.FindGameObjectWithTag("DeckManager").GetComponent<DeckManager>();
         var len = 3 * 200 - 20;
-        for (int i = 0; i<3 ;i++) 
-        {
-            var card = InstantiateDistrictCard(deckManager.takeDistrict());
-            card.transform.LeanMove(new Vector2(2000, 900), 0);
-            card.transform.LeanMove(new Vector3(-(len / 2) + 200 * i + 60 + 2200, 0, 200), 3).setEaseInOutCubic();
-            i++;
-        }
+
+        var resourcesMenu = GameObject.FindGameObjectWithTag("ResourcesMenu");
+        LeanTween.cancel(resourcesMenu);
+        resourcesMenu.transform.rotation = Quaternion.identity;
+        resourcesMenu.transform.LeanScale(new Vector3(1f, 1f), 1).setEaseInCubic().setOnComplete(
+            delegate ()
+            {
+                for (int i = 0; i < 3; i++)
+                {
+                    var card = InstantiateDistrictCard(deckManager.takeDistrict());
+                    card.transform.LeanMove(new Vector2(2000, 900), 0);
+                    card.transform.LeanMove(new Vector3(-(len / 2) + 200 * i + 60 + 2200, 0, 200), 2).setEaseInOutCubic();
+                }
+            }
+            );
     }
 
     public void endTurnButtonClick()
@@ -145,6 +153,9 @@ public class CharacterScreenManager : MonoBehaviour
 
         foreach (GameObject card in GameObject.FindGameObjectsWithTag("CharacterCard"))
         {
+            characterMenuHeader.SetActive(false);
+            GameObject characterMenu = GameObject.FindGameObjectWithTag("CharacterMenu");
+            characterMenu.transform.LeanScale(new Vector3(0.3f, 0.85f, 1), 1);
             card.transform.LeanScale(new Vector3(0, 0, 0), 2).setEaseInOutCubic().setOnComplete(
             delegate()
             {
@@ -152,15 +163,34 @@ public class CharacterScreenManager : MonoBehaviour
                 if (!movingStarted)
                 {
                     movingStarted = true;
-                    cardObject.transform.LeanScale(new Vector3(2.2f, 2.2f, 1), 1).setEaseInOutCubic().setOnComplete(
+                    cardObject.transform.LeanScale(new Vector3(2.8f, 2.8f, 1), 1).setEaseInOutCubic().setOnComplete(
                         delegate ()
                         {
-                            cardObject.transform.LeanMoveLocal(new Vector3(1600, 0, cardObject.transform.position.z), 1).setEaseInOutCubic();
+                            cardObject.transform.LeanMoveLocal(new Vector3(1300, 0, cardObject.transform.position.z), 1).setEaseInOutCubic();
+                            characterMenu.transform.LeanMove(new Vector3(1300, 0, characterMenu.transform.position.z), 1).setEaseInOutCubic();
+                            var resourcesMenu = GameObject.FindGameObjectWithTag("ResourcesMenu");
+                            resourcesMenu.transform.LeanScale(new Vector3(0.06f, 0.15f, 1), 1);
+                            resourcesMenu.transform.LeanMoveLocal(new Vector3(170, 0, 0), 0);
+                            resourcesMenu.SetActive(true);
+                            resourcesMenu.transform.LeanRotateAroundLocal(new Vector3(0, 0, 180), 360, 3).setEaseInCubic().setLoopPingPong();
                             var tm = GameObject.FindGameObjectWithTag("TurnManager");
                             tm.GetComponent<TurnManager>().callEndTurn();
                         });
                 }
             });
         }
+    }
+
+    public void distCardTaken(GameObject cardObject)
+    {
+        cardObject.tag = "PlayerDistrictCard";
+        
+        var master = getMasterPlayer();
+        //master.addDistrict();
+
+        // удалить остальные карты со сцены и вернуть их пресеты в колоду районов
+        // сделать анимацию улетания выбранной карты
+        // выключить ей кнопку
+        // ...
     }
 }

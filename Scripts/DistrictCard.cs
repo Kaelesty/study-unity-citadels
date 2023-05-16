@@ -126,9 +126,8 @@ public class DistrictCard : MonoBehaviour
     public void OnTaken()
     {
         //Debug.Log("onTaken");
-        controller.addToDistrictDeck(preset);
-        owner.addToDistricts(preset);
-        controller.callNextTurn();
+        var csm = GameObject.FindGameObjectWithTag("CSM");
+        csm.distCardTaken(preset);
     }
 
     public void loadPreset(string presetName)
