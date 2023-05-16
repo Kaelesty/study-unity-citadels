@@ -42,7 +42,7 @@ public class DeckManager : MonoBehaviourPunCallbacks
     public void callGenerateDistDeck()
     {
         distDeck = districts;
-        distDeck = deck.OrderBy(x => random.Next()).ToArray();
+        distDeck = distDeck.OrderBy(x => random.Next()).ToArray();
         view.RPC("setDistDeck", RpcTarget.All, distDeck);
     }
 
@@ -84,5 +84,20 @@ public class DeckManager : MonoBehaviourPunCallbacks
     private void deleteFirstFromDistrictDeck()
     {
         distDeck = distDeck.Skip(1).ToArray();
+    }
+
+    public void callReturnDistrict(string preset)
+    {
+        view.RPC("returnDistrict", RpcTarget.All, preset);
+    }
+
+    [PunRPC]
+    private void returnDistrict(string preset)
+    {
+        if (preset == "Money")
+        {
+            return;
+        }
+        distDeck.Append(preset);
     }
 }

@@ -11,6 +11,11 @@ public class PlayerRework : MonoBehaviourPunCallbacks
     public string nickname;
     public string character;
 
+    private int balance = 0;
+
+    public List<string> districts = new List<string>();
+    public List<string> buildedDistricts = new List<string>();
+
     private bool nicknameSetted = false;
     private bool shareRecieved = false;
 
@@ -22,6 +27,7 @@ public class PlayerRework : MonoBehaviourPunCallbacks
         {
             view.RPC("setID", RpcTarget.All, PhotonNetwork.LocalPlayer.ActorNumber);
         }
+
     }
 
     [PunRPC]
@@ -74,9 +80,36 @@ public class PlayerRework : MonoBehaviourPunCallbacks
         view.RPC("setCharacter", RpcTarget.All, preset);
     }
 
+    public void callAddDistrict(string preset)
+    {
+        view.RPC("addDistrict", RpcTarget.All, preset);
+    }
+
+    public void callIncreaseBalance(int amount)
+    {
+        view.RPC("increaseBalance", RpcTarget.All, amount);
+    }
+
+    [PunRPC]
+    private void increaseBalance(int amount)
+    {
+        balance += amount;
+        if (view.IsMine)
+        {
+            var csm = GameObject.FindGameObjectWithTag("CSM").GetComponent<CharacterScreenManager>();
+            csm.setBalance(balance);
+        }
+    }
+
     [PunRPC]
     private void setCharacter(string preset)
     {
         character = preset;
+    }
+
+    [PunRPC]
+    private void addDistrict(string preset)
+    {
+        districts.Add(preset);
     }
 }

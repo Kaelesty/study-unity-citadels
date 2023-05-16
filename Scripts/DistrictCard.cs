@@ -126,14 +126,15 @@ public class DistrictCard : MonoBehaviour
     public void OnTaken()
     {
         //Debug.Log("onTaken");
-        var csm = GameObject.FindGameObjectWithTag("CSM");
-        csm.distCardTaken(preset);
+        var csm = GameObject.FindGameObjectWithTag("CSM").GetComponent<CharacterScreenManager>();
+        csm.distCardTaken(cardObject);
     }
 
     public void loadPreset(string presetName)
     {
         preset = presetName;
-        
+        tag = "DistrictCard";
+        imageSlot.GetComponent<Image>().sprite = Resources.Load<Sprite>(presetName);
         if (distColor.ContainsKey(presetName))
         {
             color = distColor[presetName];

@@ -86,9 +86,12 @@ public class ConnectingScreenManager : MonoBehaviourPunCallbacks
     private void gameBegin()
     {
         var sm = screenManager.GetComponent<ScreenManager>();
-        sm.switchScreen("CharacterSelecting");
+        sm.switchScreen("Меню: Персонаж");
 
         var tm = GameObject.FindGameObjectWithTag("TurnManager").GetComponent<TurnManager>();
         tm.init();
+
+        var csm = GameObject.FindGameObjectWithTag("CSM").GetComponent<CharacterScreenManager>();
+        csm.init();
     }
 }

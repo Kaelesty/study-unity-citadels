@@ -1,4 +1,4 @@
-using Photon.Pun;
+﻿using Photon.Pun;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -10,6 +10,7 @@ public class CharacterScreenManager : MonoBehaviour
 
     public GameObject characterMenu;
     public GameObject characterMenuHeader;
+    public GameObject resourcesMenuHeader;
     public GameObject gamestateIndicator;
     public GameObject endTurnButton;
 
@@ -17,15 +18,59 @@ public class CharacterScreenManager : MonoBehaviour
     public GameObject distPrefab;
     public GameObject camera;
 
-    
+    private Dictionary<string, string> distColor = new Dictionary<string, string>() {
+            {"Tavern", "green"},
+            {"Market", "green"},
+            {"Trading Post", "green"},
+            {"Docks", "green"},
+            {"Harbor", "green"},
+            {"Town Hall", "green"},
+            {"Temple", "blue"},
+            {"Church", "blue"},
+            {"Monastery", "blue"},
+            {"Cathedral", "blue"},
+            {"Watchtower", "red"},
+            {"Prison", "red"},
+            {"Battlefield", "red"},
+            {"Fortress", "red"},
+            {"Manor", "yellow"},
+            {"Castle", "yellow"},
+            {"Palace", "yellow"},
+            {"Haunted City", "purple"},
+            {"Keep", "purple"},
+            {"Laboratory", "purple"},
+            {"Smithy", "purple"},
+            {"Observatory", "purple"},
+            {"Graveyard", "purple"},
+            {"School of Magic", "purple"},
+            {"Library", "purple"},
+            {"Great Wall", "purple"},
+            {"University", "purple"},
+            {"Dragon Gate", "purple"},
+        };
+
+
+
 
     private void Awake()
     {
         view = GetComponent<PhotonView>();
-        endTurnButton.SetActive(false);
         characterMenuHeader.SetActive(false);
         characterMenu.transform.LeanScale(new Vector3(0.06f, 0.12f), 0);
         characterMenu.transform.LeanRotateAroundLocal(new Vector3(0, 0, 180), 360, 3).setEaseInCubic().setLoopPingPong();
+    }
+
+    public void init()
+    {
+        var dm = GameObject.FindGameObjectWithTag("DeckManager").GetComponent<DeckManager>();
+        var cmm = GameObject.FindGameObjectWithTag("CMM").GetComponent<CitadelMenuManager>();
+        var master = getMasterPlayer().GetComponent<PlayerRework>();
+        for (int i = 0; i < 4; i++)
+        {
+            var card = dm.takeDistrict();
+            master.callAddDistrict(card);
+        }
+        cmm.updatePlayerDistricts(master.districts);
     }
 
     private GameObject getMasterPlayer()
@@ -45,7 +90,7 @@ public class CharacterScreenManager : MonoBehaviour
         var master = getMasterPlayer().GetComponent<PlayerRework>();
         if (master.checkView() && master.id == id) {
 
-            gamestateIndicator.GetComponent<Text>().text = "���� ���!";
+            gamestateIndicator.GetComponent<Text>().text = "Твой ход!";
             if (stage == 0)
             {
                 LeanTween.cancel(characterMenu);
@@ -61,12 +106,13 @@ public class CharacterScreenManager : MonoBehaviour
             else
             {
                 createResourcesVariants();
+                endTurnButton.SetActive(true);
             }
             return true;
         }
         else
         {
-            gamestateIndicator.GetComponent<Text>().text = "�������� ����...";
+            gamestateIndicator.GetComponent<Text>().text = "Ожидание хода...";
 
         }
         return false;
@@ -100,7 +146,15 @@ public class CharacterScreenManager : MonoBehaviour
             {
                 for (int i = 0; i < 3; i++)
                 {
-                    var card = InstantiateDistrictCard(deckManager.takeDistrict());
+                    GameObject card;
+                    if (i == 0)
+                    {
+                        card = InstantiateDistrictCard("Money");
+                    }
+                    else
+                    {
+                        card = InstantiateDistrictCard(deckManager.takeDistrict());
+                    }
                     card.transform.LeanMove(new Vector2(2000, 900), 0);
                     card.transform.LeanMove(new Vector3(-(len / 2) + 200 * i + 60 + 2200, 0, 200), 2).setEaseInOutCubic();
                 }
@@ -156,41 +210,176 @@ public class CharacterScreenManager : MonoBehaviour
             characterMenuHeader.SetActive(false);
             GameObject characterMenu = GameObject.FindGameObjectWithTag("CharacterMenu");
             characterMenu.transform.LeanScale(new Vector3(0.3f, 0.85f, 1), 1);
-            card.transform.LeanScale(new Vector3(0, 0, 0), 2).setEaseInOutCubic().setOnComplete(
-            delegate()
-            {
-                Destroy(card);
-                if (!movingStarted)
+            characterMenu.transform.LeanMove(new Vector3(
+                cardObject.transform.position.x,
+                cardObject.transform.position.y,
+                cardObject.transform.position.z), 1).setEaseInOutCubic().setOnComplete(
+                delegate()
                 {
-                    movingStarted = true;
-                    cardObject.transform.LeanScale(new Vector3(2.8f, 2.8f, 1), 1).setEaseInOutCubic().setOnComplete(
-                        delegate ()
+                    card.transform.LeanScale(new Vector3(0, 0, 0), 2).setEaseInOutCubic().setOnComplete(
+                    delegate ()
+                    {
+                        Destroy(card);
+                        if (!movingStarted)
                         {
-                            cardObject.transform.LeanMoveLocal(new Vector3(1300, 0, cardObject.transform.position.z), 1).setEaseInOutCubic();
-                            characterMenu.transform.LeanMove(new Vector3(1300, 0, characterMenu.transform.position.z), 1).setEaseInOutCubic();
-                            var resourcesMenu = GameObject.FindGameObjectWithTag("ResourcesMenu");
-                            resourcesMenu.transform.LeanScale(new Vector3(0.06f, 0.15f, 1), 1);
-                            resourcesMenu.transform.LeanMoveLocal(new Vector3(170, 0, 0), 0);
-                            resourcesMenu.SetActive(true);
-                            resourcesMenu.transform.LeanRotateAroundLocal(new Vector3(0, 0, 180), 360, 3).setEaseInCubic().setLoopPingPong();
-                            var tm = GameObject.FindGameObjectWithTag("TurnManager");
-                            tm.GetComponent<TurnManager>().callEndTurn();
-                        });
-                }
-            });
+                            movingStarted = true;
+                            cardObject.transform.LeanScale(new Vector3(2.8f, 2.8f, 1), 1).setEaseInOutCubic().setOnComplete(
+                                delegate ()
+                                {
+                                    cardObject.transform.LeanMoveLocal(new Vector3(1300, 0, cardObject.transform.position.z), 1).setEaseInOutCubic();
+                                    characterMenu.transform.LeanMove(new Vector3(1300, 0, characterMenu.transform.position.z), 1).setEaseInOutCubic();
+                                    var resourcesMenu = GameObject.FindGameObjectWithTag("ResourcesMenu");
+                                    resourcesMenu.transform.LeanScale(new Vector3(0.11f, 0.15f, 1), 1);
+                                    resourcesMenu.transform.LeanMoveLocal(new Vector3(170, 0, 0), 0);
+                                    resourcesMenu.SetActive(true);
+                                    resourcesMenu.transform.LeanRotateAroundLocal(new Vector3(0, 0, 180), 360, 3).setEaseInCubic().setLoopPingPong();
+                                    var tm = GameObject.FindGameObjectWithTag("TurnManager");
+                                    tm.GetComponent<TurnManager>().callEndTurn();
+                                });
+                        }
+                    });
+                });
         }
     }
 
     public void distCardTaken(GameObject cardObject)
     {
         cardObject.tag = "PlayerDistrictCard";
-        
-        var master = getMasterPlayer();
-        //master.addDistrict();
+        cardObject.GetComponent<DistrictCard>().activateBuilding(false);
 
-        // ������� ��������� ����� �� ����� � ������� �� ������� � ������ �������
-        // ������� �������� �������� ��������� �����
-        // ��������� �� ������
-        // ...
+        var cardObjectKickedOut = false;
+        
+        var master = getMasterPlayer().GetComponent<PlayerRework>();
+
+
+        if (cardObject.GetComponent<DistrictCard>().preset != "Money")
+        {
+            master.callAddDistrict(cardObject.GetComponent<DistrictCard>().preset);
+        }
+        else
+        {
+            master.callIncreaseBalance(2);
+        }
+
+        var dm = GameObject.FindGameObjectWithTag("DeckManager").GetComponent<DeckManager>();
+        foreach (GameObject card in GameObject.FindGameObjectsWithTag("DistrictCard"))
+        {
+            dm.callReturnDistrict(card.GetComponent<DistrictCard>().preset);
+            card.transform.LeanMove(new Vector2(2000, 900), 1).setEaseInOutCubic().setOnComplete(
+                delegate ()
+                {
+                    Destroy(card);
+                    if (!cardObjectKickedOut)
+                    {
+                        cardObjectKickedOut = true;
+                        cardObject.transform.LeanScale(new Vector3(2.3f, 2.3f, 1f), 1).setEaseInOutCubic().setOnComplete(
+                        delegate ()
+                        {
+                            int y = -320;
+                            int x = 3200 + 140 * (master.districts.Count - 1);
+                            cardObject.transform.LeanMoveLocal(
+                                new Vector3(x, y, cardObject.transform.position.z), 2).setEaseInOutCubic().setOnComplete(
+                                delegate()
+                                {
+                                    cardObject.GetComponent<DistrictCard>().takeButton.SetActive(false);
+                                    cardObject.GetComponent<DistrictCard>().buildButton.SetActive(false);
+                                    cardObject.transform.LeanScale(new Vector3(1.2f, 1.2f, 1), 0);
+                                    createSkillsMenu();
+                                });
+                            // Пока нет экрана цитадели, карта просто улетает за экран
+                        });
+                    }
+                });
+        }
+    }
+
+    private void createSkillsMenu()
+    {
+        resourcesMenuHeader.SetActive(false);
+        var resourcesMenu = GameObject.FindGameObjectWithTag("ResourcesMenu");
+        resourcesMenu.transform.LeanScale(new Vector3(0.0f, 0.0f, 1), 1).setEaseInOutCubic().setOnComplete(
+            delegate()
+            {
+                resourcesMenuHeader.SetActive(true);
+                resourcesMenuHeader.GetComponent<Text>().text = "Способность";
+
+                
+                string text = "";
+
+                var master = getMasterPlayer().GetComponent<PlayerRework>();
+
+                int newBalance;
+
+                switch (master.character)
+                {
+                    case "Merchant":
+                        newBalance = 1;
+                        foreach (var district in master.buildedDistricts)
+                        {
+                            if (distColor[district] == "green")
+                            {
+                                newBalance++;
+                            }
+                        }
+                        master.callIncreaseBalance(newBalance);
+                        text = "Пассивная способность:\n★ +2 золотой\n★ +1 золотой за каждый зеленый район";
+                        break;
+                    case "Bishop":
+                        newBalance = 0;
+                        foreach (var district in master.buildedDistricts)
+                        {
+                            if (distColor[district] == "blue")
+                            {
+                                newBalance++;
+                            }
+                        }
+                        master.callIncreaseBalance(newBalance);
+                        text = "Пассивная способность:\n★ +1 золотой за каждый синий район\n★ Ваши районы нельзя разрушить";
+                        break;
+                    case "Architect":
+                        var dm = GameObject.FindGameObjectWithTag("DeckManager").GetComponent<DeckManager>();
+                        for (int i = 0; i < 2;i++)
+                        {
+                            var card = dm.takeDistrict();
+                            master.callAddDistrict(card);
+                            var cardObject = InstantiateDistrictCard(card);
+                            cardObject.tag = "PlayerDistrictCard";
+                            cardObject.GetComponent<DistrictCard>().takeButton.SetActive(false);
+                            cardObject.GetComponent<DistrictCard>().buildButton.SetActive(false);
+                            cardObject.transform.LeanScale(new Vector3(1.2f, 1.2f, 1), 0);
+                            int y = -320;
+                            int x = 3200 + 140 * (master.districts.Count - 1);
+                            cardObject.transform.LeanMove(new Vector3(x, y, 1), 0);
+                        }
+                        text = "Пассивная способность:\n★ Можно построить до трех районов\n★ Получено 2 карты районов";
+                        break;
+                    case "King":
+                        text = "Пассивная способность:\n★ Следующий ход начнется с вас";
+                        break;
+                    case "Thief":
+                        text = "Активная способность:\n★ Выберите персонажа, все деньги которого\nперейдут к вам";
+                        break;
+                    case "Assassin":
+                        text = "Активная способность:\n★ Выберите персонажа, который пропустит этот ход";
+                        break;
+                    case "Warlord":
+                        text = "Активная способность:\n★ Выберите игрока и его район, который будет разрушен\n(Меню шпионажа)";
+                        break;
+                    case "Magician":
+                        text = "Активная способность:\n★ Выберите игрока, с которым вы обменяетесь картами районов\nИЛИ Сбросьте свои карты в колоду и получите столько же новых";
+                        break;
+                }
+                var description = GameObject.FindGameObjectWithTag("Description");
+                description.transform.LeanScale(new Vector3(1f, 1f, 1f), 0);
+                description.GetComponent<Text>().text = text;
+
+                resourcesMenu.transform.LeanScale(new Vector3(1, 1, 1), 1).setEaseInOutCubic();
+            });
+    }
+
+    public void setBalance(int balance)
+    {
+        var balanceIndicator = GameObject.FindGameObjectWithTag("Balance");
+        balanceIndicator.GetComponent<Text>().text = "Баланс: " + balance.ToString();
     }
 }

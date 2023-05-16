@@ -13,14 +13,15 @@ public class ScreenManager : MonoBehaviour
 
     public void Start()
     {
-        screens["Connecting"] = new int[2] { 0, 0 };
-        screens["CharacterSelecting"] = new int[2] { 2000, 0 };
+        screens["Подключение"] = new int[2] { 0, 0 };
+        screens["Меню: Персонаж"] = new int[2] { 2000, 0 };
+        screens["Меню: Цитадель"] = new int[2] { 4000, 0 };
 
         var dropdown = screenSelector.GetComponent<Dropdown>();
         dropdown.ClearOptions();
         foreach (var screen in screens.Keys)
         {
-            if (screen == "Connecting")
+            if (screen == "Подключение")
             {
                 continue;
             }
@@ -40,15 +41,18 @@ public class ScreenManager : MonoBehaviour
     public void switchScreen(string screenName)
     {
         var screenPosition = screens[screenName];
-        camera.transform.LeanMoveLocal(new Vector3(screenPosition[0], screenPosition[1], (float)-325.4922), 2).setEaseInCubic().setOnComplete(
+        camera.transform.LeanMoveLocal(new Vector3(screenPosition[0], screenPosition[1], (float)-325.4922), 1).setEaseInCubic().setOnComplete(
             delegate()
             {
-                if (screenName == "CharacterSelecting") { enableSelector(); }
+                if (screenName == "Меню: Персонаж") { enableUI(); }
             });
     }
 
-    public void enableSelector()
+    public void enableUI()
     {
-        screenSelector.SetActive(true);
+        foreach (GameObject cameraUI in GameObject.FindGameObjectsWithTag("CameraUI"))
+        {
+            cameraUI.transform.LeanScale(new Vector3(1f, 1f, 1f), 0);
+        }
     }
 }
