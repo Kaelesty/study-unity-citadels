@@ -248,12 +248,14 @@ public class CharacterScreenManager : MonoBehaviour
         {
             characterMenuHeader.SetActive(false);
             GameObject characterMenu = GameObject.FindGameObjectWithTag("CharacterMenu");
-            characterMenu.transform.LeanScale(new Vector3(0.3f, 0.85f, 1), 1);
-            characterMenu.transform.LeanMove(new Vector3(
+            characterMenu.transform.LeanScale(new Vector3(0.3f, 0.85f, 1), 1).setEaseInOutCubic().setOnComplete(
+                delegate ()
+                {
+                    characterMenu.transform.LeanMove(new Vector3(
                 cardObject.transform.position.x,
                 cardObject.transform.position.y,
                 cardObject.transform.position.z), 1).setEaseInOutCubic().setOnComplete(
-                delegate()
+                delegate ()
                 {
                     card.transform.LeanScale(new Vector3(0, 0, 0), 2).setEaseInOutCubic().setOnComplete(
                     delegate ()
@@ -277,6 +279,7 @@ public class CharacterScreenManager : MonoBehaviour
                                 });
                         }
                     });
+                });
                 });
         }
     }

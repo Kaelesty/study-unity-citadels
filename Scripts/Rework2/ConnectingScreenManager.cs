@@ -93,5 +93,8 @@ public class ConnectingScreenManager : MonoBehaviourPunCallbacks
 
         var csm = GameObject.FindGameObjectWithTag("CSM").GetComponent<CharacterScreenManager>();
         csm.init();
+
+        var ssm = GameObject.FindGameObjectWithTag("SSM").GetComponent<SpyScreenManager>();
+        ssm.init();
     }
 }

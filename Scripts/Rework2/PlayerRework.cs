@@ -11,6 +11,8 @@ public class PlayerRework : MonoBehaviourPunCallbacks
     public string nickname;
     public string character;
 
+    public bool characterShown;
+
     private int balance = 0;
 
     public List<string> districts = new List<string>();
