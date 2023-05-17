@@ -6,15 +6,15 @@ using UnityEngine;
 public class TurnManager : MonoBehaviourPunCallbacks
 {
     PhotonView view;
-    private int[] queue = null;
+    public int[] queue = null;
 
     public GameObject endTurnButton;
 
-    private int stage = 0;
+    public int stage = 0;
     // 0 - выбор персонажей, 1 - основной
     // (Относительно GameRework) 1 - объединение всех Major этапов
 
-    private int currentQueueIndex = 0;
+    public int currentQueueIndex = 0;
 
     private string[] characters = { "Assassin", "Thief", "Magician", "King", "Bishop", "Merchant", "Architect", "Warlord" };
 
@@ -52,6 +52,7 @@ public class TurnManager : MonoBehaviourPunCallbacks
         var dm = GameObject.FindGameObjectWithTag("DeckManager");
         if (currentQueueIndex >= queue.Length)
         {
+            currentQueueIndex = 0;
             if (stage == 0)
             {
                 stage = 1;

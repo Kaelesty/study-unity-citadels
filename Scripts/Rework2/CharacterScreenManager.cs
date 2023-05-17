@@ -133,8 +133,25 @@ public class CharacterScreenManager : MonoBehaviour
         else
         {
             gamestateIndicator.GetComponent<Text>().text = "Ожидание хода...";
+            endTurnButton.SetActive(false);
+            foreach (GameObject card in GameObject.FindGameObjectsWithTag("DistrictCard"))
+            {
+                card.transform.LeanScale(new Vector3(0f, 0f, 0f), 1).setEaseOutCubic().setOnComplete(
+                    delegate ()
+                    {
+                        Destroy(card);
+                    });
+            }
+            var resourcesMenu = GameObject.FindGameObjectWithTag("ResourcesMenu");
+            if (resourcesMenu.transform.localScale.x > 0f)
+            {
+                resourcesMenu.transform.LeanScale(new Vector3(0.11f, 0.15f, 1), 1);
+                resourcesMenu.transform.LeanMoveLocal(new Vector3(170, 0, 0), 0);
+                resourcesMenu.transform.LeanRotateAroundLocal(new Vector3(0, 0, 180), 360, 3).setEaseInCubic().setLoopPingPong();
+            }
             if (view.IsMine && callFromCharReset)
             {
+                Debug.Log("callFromCharReset");
                 characterMenu.transform.LeanMove(new Vector3(2000, 0, characterMenu.transform.position.z), 1).setEaseInOutCubic();
                 characterMenuHeader.SetActive(false);
                 characterMenu.transform.LeanScale(new Vector3(0.06f, 0.12f), 0);
@@ -153,6 +170,10 @@ public class CharacterScreenManager : MonoBehaviour
                 Destroy(character);
                 var master = getMasterPlayer().GetComponent<PlayerRework>();
                 master.callSetCharacter("");
+                characterMenu.transform.LeanMove(new Vector3(2000, 0, characterMenu.transform.position.z), 1).setEaseInOutCubic();
+                characterMenuHeader.SetActive(false);
+                characterMenu.transform.LeanScale(new Vector3(0.06f, 0.12f), 0);
+                characterMenu.transform.LeanRotateAroundLocal(new Vector3(0, 0, 180), 360, 3).setEaseInCubic().setLoopPingPong();
                 turn(id, stage, true);
             });
     }
