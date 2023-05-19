@@ -46,6 +46,37 @@ public class SpyScreenManager : MonoBehaviour
         var targetNickname = dropdown.options[dropdown.value].text;
         PlayerRework target;
 
+        for (int i = 0; i < targets.Count; i++)
+        {
+            if (targets[i].nickname == targetNickname)
+            {
+                target = targets[i];
+                break;
+            }
+        }
+
+        var presetChar = "";
+        var presetDist = "";
+        var shift = 175;
+
+        if (target.characterShown == true)
+        {
+            presetChar = target.сharacter;
+        }
+        else
+        {
+            presetChar = "unknown";
+        }
+
+        var cardChar = csm.InstantiateCharCard(presetChar);
+        cardChar.transform.LeanMove(new Vector3(2000, 0, cardChar.transform.position.z), 1);
+
+        for (int i = 0; i < target.buildedDistricts.Count; i++)
+        {
+            presetDist = target.buildedDistricts[i];
+            var cardDist = csm.InstantiateDistrictCard(presetDist);
+            cardDist.transform.LeanMove(new Vector3(1800 + i*shift, 1150, cardChar.transform.position.z), 1);
+        }
         // TODO : Экран шпионажа
         // В переменной targetNickname лежит НИКНЕЙМ игрока, за которым хотим шпионить
         // В переменной targets лежит список ОБЪЕКТОВ игроков
