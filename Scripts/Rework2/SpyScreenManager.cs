@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Device;
+using UnityEngine.TextCore.Text;
 using UnityEngine.UI;
 
 public class SpyScreenManager : MonoBehaviour
@@ -31,6 +32,7 @@ public class SpyScreenManager : MonoBehaviour
             option.text = players[i];
             dropdown.options.Add(option);
         }
+        targetSelectorOnChange();
     }
 
     public void targetSelectorOnChange()
@@ -44,7 +46,7 @@ public class SpyScreenManager : MonoBehaviour
         }
         var dropdown = targetSelector.GetComponent<Dropdown>();
         var targetNickname = dropdown.options[dropdown.value].text;
-        PlayerRework target;
+        PlayerRework target = null;
 
         for (int i = 0; i < targets.Count; i++)
         {
@@ -61,7 +63,7 @@ public class SpyScreenManager : MonoBehaviour
 
         if (target.characterShown == true)
         {
-            presetChar = target.ñharacter;
+            presetChar = target.character;
         }
         else
         {

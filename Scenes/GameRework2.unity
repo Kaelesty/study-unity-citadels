@@ -4363,7 +4363,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 375a7448485137349be80c9f7bffbd50, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  queue: 
   endTurnButton: {fileID: 658722463}
+  stage: 0
+  currentQueueIndex: 0
 --- !u!1 &1096839520
 GameObject:
   m_ObjectHideFlags: 0
