@@ -103,6 +103,18 @@ public class CharacterScreenManager : MonoBehaviour
             gamestateIndicator.GetComponent<Text>().text = "Твой ход!";
             if (stage == 0)
             {
+                foreach (GameObject card in GameObject.FindGameObjectsWithTag("PlayerDistrictCard"))
+                {
+                    card.GetComponent<DistrictCard>().buildButton.SetActive(false);
+                }
+                foreach (GameObject card in GameObject.FindGameObjectsWithTag("DistrictCard"))
+                {
+                    card.LeanScale(new Vector3(0f, 0f, 0f), 0.1f).setEaseOutCubic().setOnComplete(
+                        delegate ()
+                        {
+                            Destroy(card);
+                        }); 
+                }
                 LeanTween.cancel(characterMenu);
                 characterMenu.transform.rotation = Quaternion.identity;
                 endTurnButton.SetActive(false);
@@ -338,15 +350,31 @@ public class CharacterScreenManager : MonoBehaviour
                         cardObject.transform.LeanScale(new Vector3(2.3f, 2.3f, 1f), 1).setEaseInOutCubic().setOnComplete(
                         delegate ()
                         {
-                            int y = -320;
-                            int x = 3200 + 140 * (master.districts.Count - 1);
+                            int x, y;
+                            if (cardObject.GetComponent<DistrictCard>().preset != "Money")
+                            {
+                                y = -320;
+                                x = 3200 + 140 * (master.districts.Count - 1);
+                            }
+                            else
+                            {
+                                y = 1000;
+                                x = 2000;
+                            }
                             cardObject.transform.LeanMoveLocal(
                                 new Vector3(x, y, cardObject.transform.position.z), 2).setEaseInOutCubic().setOnComplete(
                                 delegate()
                                 {
-                                    cardObject.GetComponent<DistrictCard>().takeButton.SetActive(false);
-                                    cardObject.GetComponent<DistrictCard>().buildButton.SetActive(true);
-                                    cardObject.transform.LeanScale(new Vector3(1.2f, 1.2f, 1), 0);
+                                    if (cardObject.GetComponent<DistrictCard>().preset != "Money")
+                                    {
+                                        cardObject.GetComponent<DistrictCard>().takeButton.SetActive(false);
+                                        cardObject.GetComponent<DistrictCard>().buildButton.SetActive(true);
+                                        cardObject.transform.LeanScale(new Vector3(1.2f, 1.2f, 1), 0);
+                                    }
+                                    else
+                                    {
+                                        Destroy(cardObject);
+                                    }
                                     createSkillsMenu();
                                 });
                         });

@@ -28,6 +28,9 @@ public class DistrictCard : MonoBehaviour
 
     public bool isBuilded = false;
 
+    private Vector3 initialPosition;
+    private int shakeCounter = 0;
+
 
     private Dictionary<string, string> distName = new Dictionary<string, string>() {
             {"Tavern", "Таверна"},
@@ -154,5 +157,32 @@ public class DistrictCard : MonoBehaviour
     {
         var cmm = GameObject.FindGameObjectWithTag("CMM").GetComponent<CitadelMenuManager>();
         cmm.distCardBuild(cardObject);
+    }
+
+    public void shake()
+    {
+        initialPosition = transform.position;
+        shakeCounter = 0;
+        shakeVertical();
+        transform.LeanMoveLocal(initialPosition, 0.05f).setEaseInCubic();
+    }
+
+    private void shakeVertical()
+    {
+        if (shakeCounter == 2)
+        {
+            transform.LeanMoveLocal(initialPosition, 0.05f).setEaseInCubic();
+            return;
+        }
+        shakeCounter++;
+        transform.LeanMoveLocal(new Vector3(transform.position.x + 5, transform.position.y, transform.position.z), 0.05f).setEaseOutCubic().setOnComplete(
+            delegate ()
+            {
+                transform.LeanMoveLocal(new Vector3(transform.position.x - 10, transform.position.y, transform.position.z), 0.05f).setEaseOutCubic().setOnComplete(
+                    delegate ()
+                    {
+                        shakeVertical();
+                    });
+            });
     }
 }

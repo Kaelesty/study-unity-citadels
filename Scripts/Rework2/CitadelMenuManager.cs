@@ -30,15 +30,21 @@ public class CitadelMenuManager : MonoBehaviour
 
     public void distCardBuild(GameObject cardObject)
     {
+        var csm = GameObject.FindGameObjectWithTag("CSM").GetComponent<CharacterScreenManager>();
+        var master = csm.getMasterPlayer().GetComponent<PlayerRework>();
+        if (cardObject.GetComponent<DistrictCard>().price > master.getBalance() && !debugAllowNegativeBalance) 
+        {
+            cardObject.GetComponent<DistrictCard>().shake();
+            return;
+        }
         if (building)
         {
             return;
         }
         building = true;
-        var csm = GameObject.FindGameObjectWithTag("CSM").GetComponent<CharacterScreenManager>();
-        var master = csm.getMasterPlayer().GetComponent<PlayerRework>();
         master.callBuildDistrict(cardObject.GetComponent<DistrictCard>().preset);
         master.callDeleteDistrict(cardObject.GetComponent<DistrictCard>().preset);
+        master.callIncreaseBalance(-cardObject.GetComponent<DistrictCard>().price);
         cardObject.GetComponent<DistrictCard>().buildButton.SetActive(false);
         builtCounter++;
         if (((builtCounter == 1 && master.character != "Architect") || (builtCounter == 3)) && !debugUnlimitedBuilding)

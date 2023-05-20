@@ -113,6 +113,11 @@ public class PlayerRework : MonoBehaviourPunCallbacks
         }
     }
 
+    public int getBalance()
+    {
+        return balance;
+    }
+
     [PunRPC]
     private void setCharacter(string preset)
     {
