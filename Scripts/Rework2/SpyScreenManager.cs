@@ -32,7 +32,11 @@ public class SpyScreenManager : MonoBehaviour
             option.text = players[i];
             dropdown.options.Add(option);
         }
-        targetSelectorOnChange();
+        if (dropdown.options.Count > 0)
+        {
+            dropdown.value = 0;
+            targetSelectorOnChange();
+        }
     }
 
     public void targetSelectorOnChange()

@@ -48,6 +48,7 @@ MonoBehaviour:
   id: 0
   nickname: 
   character: 
+  characterShown: 0
   districts: []
   buildedDistricts: []
 --- !u!114 &6910778313287793776
