@@ -21,6 +21,8 @@ public class PlayerRework : MonoBehaviourPunCallbacks
     private bool nicknameSetted = false;
     private bool shareRecieved = false;
 
+    private bool assassinMarker = false;
+
     private void Awake()
     {
         view = GetComponent<PhotonView>();
@@ -102,6 +104,21 @@ public class PlayerRework : MonoBehaviourPunCallbacks
         view.RPC("deleteDistrict", RpcTarget.All, preset);
     }
 
+    public void callSetAssassinMarker(bool value)
+    {
+        view.RPC("setAssassinMarker", RpcTarget.All, value);
+    }
+
+    public bool getAssassinMarker()
+    {
+        return assassinMarker;
+    }
+
+    public void callSetMessage(string message)
+    {
+        view.RPC("setMessage", RpcTarget.All, message);
+    }
+
     [PunRPC]
     private void increaseBalance(int amount)
     {
@@ -140,5 +157,21 @@ public class PlayerRework : MonoBehaviourPunCallbacks
     private void deleteDistrict(string preset)
     {
         districts.Remove(preset);
+    }
+
+    [PunRPC]
+    private void setAssassinMarker(bool value)
+    {
+        assassinMarker = value;
+    }
+
+    [PunRPC]
+    private void setMessage(string message)
+    {
+        var csm = GameObject.FindGameObjectWithTag("CSM").GetComponent<CharacterScreenManager>();
+        if (view.IsMine)
+        {
+            csm.setMessage(message);
+        }
     }
 }

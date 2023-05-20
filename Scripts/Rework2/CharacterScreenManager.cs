@@ -1,6 +1,7 @@
 ﻿using Photon.Pun;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -48,6 +49,16 @@ public class CharacterScreenManager : MonoBehaviour
             {"University", "purple"},
             {"Dragon Gate", "purple"},
         };
+    private Dictionary<string, string> charNames = new Dictionary<string, string>() {
+            { "Assassin", "Ассассин"},
+            { "Thief", "Вор"},
+            { "Bishop", "Епископ"},
+            { "Magician", "Чародей"},
+            { "Architect", "Зодчий"},
+            { "Merchant", "Купец"},
+            { "Warlord", "Кондотьер"},
+            { "King", "Король"},
+        };
 
 
 
@@ -58,6 +69,9 @@ public class CharacterScreenManager : MonoBehaviour
         characterMenuHeader.SetActive(false);
         characterMenu.transform.LeanScale(new Vector3(0.06f, 0.12f), 0);
         characterMenu.transform.LeanRotateAroundLocal(new Vector3(0, 0, 180), 360, 3).setEaseInCubic().setLoopPingPong();
+
+        var resourcesMenu = GameObject.FindGameObjectWithTag("ResourcesMenu");
+        resourcesMenu.LeanScale(new Vector3(0f, 0f, 1f), 0);
     }
 
     public void init()
@@ -99,6 +113,15 @@ public class CharacterScreenManager : MonoBehaviour
             description.transform.LeanScale(new Vector3(0f, 0f, 1), 0);
         }
         if (master.checkView() && master.id == id) {
+            if (master.getAssassinMarker())
+            {
+                master.callSetAssassinMarker(false);
+                endTurnButtonClick();
+                return false;
+            }
+            GameObject.FindGameObjectWithTag("MessageUI").LeanScale(new Vector3(0f, 0f, 1f), 0).setEaseInOutCubic();
+            GameObject.FindGameObjectWithTag("Message").LeanScale(new Vector3(0f, 0f, 1f), 0).setEaseInOutCubic();
+
 
             gamestateIndicator.GetComponent<Text>().text = "Твой ход!";
             if (stage == 0)
@@ -236,9 +259,17 @@ public class CharacterScreenManager : MonoBehaviour
 
     public void endTurnButtonClick()
     {
+        if (getMasterPlayer().GetComponent<PlayerRework>().character == "Thief") {
+            handleThiefSkill();
+        }
+        else if (getMasterPlayer().GetComponent<PlayerRework>().character == "Assassin")
+            {
+                handleAssassinSkill();
+            }
         endTurnButton.SetActive(false);
         var tm = GameObject.FindGameObjectWithTag("TurnManager");
         tm.GetComponent<TurnManager>().callEndTurn();
+        GameObject.FindGameObjectWithTag("SkillTargetSelector").LeanScale(new Vector3(0f, 0f, 1f), 0);
     }
 
     public GameObject InstantiateCharCard(string presetName)
@@ -392,14 +423,13 @@ public class CharacterScreenManager : MonoBehaviour
             {
                 resourcesMenuHeader.SetActive(true);
                 resourcesMenuHeader.GetComponent<Text>().text = "Способность";
-
-                
                 string text = "";
-
                 var master = getMasterPlayer().GetComponent<PlayerRework>();
-
                 int newBalance;
-
+                DeckManager dm;
+                GameObject selector;
+                Dropdown dropdown;
+                string[] options = { "--------", "Король", "Чародей", "Купец", "Зодчий", "Кондотьер", "Епископ"};
                 switch (master.character)
                 {
                     case "Merchant":
@@ -427,7 +457,7 @@ public class CharacterScreenManager : MonoBehaviour
                         text = "Пассивная способность:\n★ +1 золотой за каждый синий район\n★ Ваши районы нельзя разрушить";
                         break;
                     case "Architect":
-                        var dm = GameObject.FindGameObjectWithTag("DeckManager").GetComponent<DeckManager>();
+                        dm = GameObject.FindGameObjectWithTag("DeckManager").GetComponent<DeckManager>();
                         for (int i = 0; i < 2;i++)
                         {
                             var card = dm.takeDistrict();
@@ -448,9 +478,34 @@ public class CharacterScreenManager : MonoBehaviour
                         break;
                     case "Thief":
                         text = "Активная способность:\n★ Выберите персонажа, все деньги которого\nперейдут к вам";
+                        dm = GameObject.FindGameObjectWithTag("DeckManager").GetComponent<DeckManager>();
+                        selector = GameObject.FindGameObjectWithTag("SkillTargetSelector");
+                        selector.transform.LeanScale(new Vector3(1f, 1f, 1f), 1).setEaseInOutCubic();
+                        dropdown = selector.GetComponent<Dropdown>();
+                        dropdown.ClearOptions();
+                        foreach (var item in options)
+                        {
+                            var option = new Dropdown.OptionData();
+                            option.text = item;
+                            dropdown.options.Add(option);
+                        }
+                        dropdown.value = 0;
                         break;
                     case "Assassin":
                         text = "Активная способность:\n★ Выберите персонажа, который пропустит этот ход";
+                        dm = GameObject.FindGameObjectWithTag("DeckManager").GetComponent<DeckManager>();
+                        selector = GameObject.FindGameObjectWithTag("SkillTargetSelector");
+                        selector.transform.LeanScale(new Vector3(1f, 1f, 1f), 1).setEaseInOutCubic();
+                        dropdown = selector.GetComponent<Dropdown>();
+                        dropdown.ClearOptions();
+                        options.Append("Вор");
+                        foreach ( var item in options )
+                        {
+                            var option = new Dropdown.OptionData();
+                            option.text = item;
+                            dropdown.options.Add(option);
+                        }
+                        dropdown.value = 0;
                         break;
                     case "Warlord":
                         text = "Активная способность:\n★ Выберите игрока и его район, который будет разрушен\n(Меню шпионажа)";
@@ -471,5 +526,69 @@ public class CharacterScreenManager : MonoBehaviour
     {
         var balanceIndicator = GameObject.FindGameObjectWithTag("Balance");
         balanceIndicator.GetComponent<Text>().text = "Баланс: " + balance.ToString();
+    }
+
+    public PlayerRework getPlayerWithCharacter(string character)
+    {
+        PlayerRework result = null;
+        foreach (var player in GameObject.FindGameObjectsWithTag("Player"))
+        {
+            if (player.GetComponent<PlayerRework>().character == character)
+            {
+                result = player.GetComponent<PlayerRework>();
+                break;
+            }
+        }
+        return result;
+    }
+
+    private void handleThiefSkill()
+    {
+        var master = getMasterPlayer().GetComponent<PlayerRework>();
+        var dropdown =  GameObject.FindGameObjectWithTag("SkillTargetSelector").GetComponent<Dropdown>();
+        var characterToRob = dropdown.options[dropdown.value].text;
+        PlayerRework target = null;
+        foreach (var value in charNames.Keys)
+        {
+            if (charNames[value] == characterToRob)
+            {
+                target = getPlayerWithCharacter(value);
+            }
+        }
+        if (target != null)
+        {
+            int profit = target.getBalance();
+            target.callIncreaseBalance(-profit);
+            master.callIncreaseBalance(profit);
+            target.callSetMessage("Вы были ограблены!");
+        }
+    }
+
+    private void handleAssassinSkill()
+    {
+        var master = getMasterPlayer().GetComponent<PlayerRework>();
+        var dropdown = GameObject.FindGameObjectWithTag("SkillTargetSelector").GetComponent<Dropdown>();
+        var characterToKill = dropdown.options[dropdown.value].text;
+        PlayerRework target = null;
+        foreach (var value in charNames.Keys)
+        {
+            if (charNames[value] == characterToKill)
+            {
+                target = getPlayerWithCharacter(value);
+            }
+        }
+        if (target != null)
+        {
+            target.callSetAssassinMarker(true);
+            target.callSetMessage("Вы пропускаете ход");
+        }
+    }
+
+    public void setMessage(string message)
+    {
+        var messageUI = GameObject.FindGameObjectWithTag("Message");
+        GameObject.FindGameObjectWithTag("MessageUI").LeanScale(new Vector3(1f, 1f, 1f), 0).setEaseInOutCubic();
+        messageUI.LeanScale(new Vector3(1f, 1f, 1f), 0).setEaseInOutCubic();
+        messageUI.GetComponent<Text>().text = message;
     }
 }
