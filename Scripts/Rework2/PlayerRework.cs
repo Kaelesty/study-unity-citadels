@@ -174,4 +174,34 @@ public class PlayerRework : MonoBehaviourPunCallbacks
             csm.setMessage(message);
         }
     }
+
+    public void callAskToResetDistricts()
+    {
+        view.RPC("askToResetDistricts", RpcTarget.All);
+
+    }
+
+    [PunRPC]
+    private void askToResetDistricts()
+    {
+        if (view.IsMine)
+        {
+            var csm = GameObject.FindGameObjectWithTag("CSM").GetComponent<CharacterScreenManager>();
+            csm.resetMasterDistricts();
+        }
+    }
+
+    public void callAskToSetDistricts(List<string> newDistricts)
+    {
+        view.RPC("askToSetDistricts", RpcTarget.All, newDistricts);
+    }
+
+    private void askToSetDistricts(List<string> newDistricts)
+    {
+        if (view.IsMine)
+        {
+            var csm = GameObject.FindGameObjectWithTag("CSM").GetComponent<CharacterScreenManager>();
+            csm.setMasterDistricts(newDistricts);
+        }
+    }
 }

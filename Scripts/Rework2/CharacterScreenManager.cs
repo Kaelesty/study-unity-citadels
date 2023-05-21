@@ -1,8 +1,10 @@
 ﻿using Photon.Pun;
+using Photon.Realtime;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
+using UnityEngine.Timeline;
 using UnityEngine.UI;
 
 public class CharacterScreenManager : MonoBehaviour
@@ -259,13 +261,15 @@ public class CharacterScreenManager : MonoBehaviour
 
     public void endTurnButtonClick()
     {
-        if (getMasterPlayer().GetComponent<PlayerRework>().character == "Thief") {
-            handleThiefSkill();
+        switch (getMasterPlayer().GetComponent<PlayerRework>().character)
+        {
+            case "Thief":
+                handleThiefSkill(); break;
+            case "Assassin":
+                handleAssassinSkill(); break;
+            case "Magician":
+                handleMagicianSkill(); break;
         }
-        else if (getMasterPlayer().GetComponent<PlayerRework>().character == "Assassin")
-            {
-                handleAssassinSkill();
-            }
         endTurnButton.SetActive(false);
         var tm = GameObject.FindGameObjectWithTag("TurnManager");
         tm.GetComponent<TurnManager>().callEndTurn();
@@ -429,7 +433,8 @@ public class CharacterScreenManager : MonoBehaviour
                 DeckManager dm;
                 GameObject selector;
                 Dropdown dropdown;
-                string[] options = { "--------", "Король", "Чародей", "Купец", "Зодчий", "Кондотьер", "Епископ"};
+                string[] options = { "<Пропустить>", "Король", "Чародей", "Купец", "Зодчий", "Кондотьер", "Епископ"};
+                Dropdown.OptionData option;
                 switch (master.character)
                 {
                     case "Merchant":
@@ -485,7 +490,7 @@ public class CharacterScreenManager : MonoBehaviour
                         dropdown.ClearOptions();
                         foreach (var item in options)
                         {
-                            var option = new Dropdown.OptionData();
+                            option = new Dropdown.OptionData();
                             option.text = item;
                             dropdown.options.Add(option);
                         }
@@ -501,7 +506,7 @@ public class CharacterScreenManager : MonoBehaviour
                         options.Append("Вор");
                         foreach ( var item in options )
                         {
-                            var option = new Dropdown.OptionData();
+                            option = new Dropdown.OptionData();
                             option.text = item;
                             dropdown.options.Add(option);
                         }
@@ -512,6 +517,28 @@ public class CharacterScreenManager : MonoBehaviour
                         break;
                     case "Magician":
                         text = "Активная способность:\n★ Выберите игрока, с которым вы обменяетесь картами районов\nИЛИ Сбросьте свои карты в колоду и\n получите столько же новых";
+                        dm = GameObject.FindGameObjectWithTag("DeckManager").GetComponent<DeckManager>();
+                        selector = GameObject.FindGameObjectWithTag("SkillTargetSelector");
+                        selector.transform.LeanScale(new Vector3(1f, 1f, 1f), 1).setEaseInOutCubic();
+                        dropdown = selector.GetComponent<Dropdown>();
+                        dropdown.ClearOptions();
+        
+                        foreach (var player in GameObject.FindGameObjectsWithTag("Player"))
+                        {
+                            if (player.GetComponent<PlayerRework>().nickname != master.nickname)
+                            {
+                                option = new Dropdown.OptionData();
+                                option.text = player.GetComponent<PlayerRework>().nickname;
+                                dropdown.options.Add(option);
+                            }
+                        }
+                        option = new Dropdown.OptionData();
+                        option.text = "<Заменить>";
+                        dropdown.options.Add(option);
+                        option = new Dropdown.OptionData();
+                        option.text = "<Пропустить>";
+                        dropdown.options.Add(option);
+                        dropdown.value = 0;
                         break;
                 }
                 var description = GameObject.FindGameObjectWithTag("Description");
@@ -534,6 +561,20 @@ public class CharacterScreenManager : MonoBehaviour
         foreach (var player in GameObject.FindGameObjectsWithTag("Player"))
         {
             if (player.GetComponent<PlayerRework>().character == character)
+            {
+                result = player.GetComponent<PlayerRework>();
+                break;
+            }
+        }
+        return result;
+    }
+
+    public PlayerRework getPlayerWithNickname(string nickname)
+    {
+        PlayerRework result = null;
+        foreach (var player in GameObject.FindGameObjectsWithTag("Player"))
+        {
+            if (player.GetComponent<PlayerRework>().nickname == nickname)
             {
                 result = player.GetComponent<PlayerRework>();
                 break;
@@ -581,6 +622,76 @@ public class CharacterScreenManager : MonoBehaviour
         {
             target.callSetAssassinMarker(true);
             target.callSetMessage("Вы пропускаете ход");
+        }
+    }
+
+    private void handleMagicianSkill()
+    {
+        var master = getMasterPlayer().GetComponent<PlayerRework>();
+        var dropdown = GameObject.FindGameObjectWithTag("SkillTargetSelector").GetComponent<Dropdown>();
+        var csm = GameObject.FindGameObjectWithTag("CSM").GetComponent<CharacterScreenManager>();
+        var dm = GameObject.FindGameObjectWithTag("DeckManager").GetComponent<DeckManager>();
+        switch (dropdown.options[dropdown.value].text)
+        {
+            case "<Пропустить>":
+                return;
+            case "<Заменить>":
+                int cardsNum = master.districts.Count;
+                resetMasterDistricts();
+                List<string> newDistricts = new List<string>();
+                for (int i = 0; i < cardsNum; i++)
+                {
+                    newDistricts.Add(dm.takeDistrict());
+                }
+                setMasterDistricts(newDistricts);
+                break;
+            default:
+                var target = getPlayerWithNickname(dropdown.options[dropdown.value].text).GetComponent<PlayerRework>();
+                var masterDistricts = master.districts;
+                var targetDistricts = target.districts;
+
+                resetMasterDistricts();
+                target.callAskToResetDistricts();
+
+                setMasterDistricts(targetDistricts);
+                target.callAskToSetDistricts(masterDistricts);
+                break;
+        }
+
+    }
+
+    public void resetMasterDistricts()
+    {
+        var master = getMasterPlayer().GetComponent<PlayerRework>();
+        var dm = GameObject.FindGameObjectWithTag("DeckManager").GetComponent<DeckManager>();
+        foreach (var card in GameObject.FindGameObjectsWithTag("PlayerDistrictCard"))
+        {
+            master.callDeleteDistrict(card.GetComponent<DistrictCard>().preset);
+            dm.callReturnDistrict(card.GetComponent<DistrictCard>().preset);
+            card.transform.LeanScale(new Vector3(0f, 0f, card.transform.position.z), 1).setEaseOutCubic().setOnComplete(
+                delegate ()
+                {
+                    Destroy(card);
+                });
+        }
+    }
+
+    public void setMasterDistricts(List<string> newDistricts)
+    {
+        var master = getMasterPlayer().GetComponent<PlayerRework>();
+        int x, y;
+        for (int i = 0; i < newDistricts.Count; i++)
+        {
+            y = -320;
+            x = 3200 + 140 * i;
+            var newDistrict = InstantiateDistrictCard(newDistricts[i]);
+            newDistrict.tag = "PlayerDistrictCard";
+            newDistrict.transform.LeanMove(new Vector3(4500f, 600f, 200), 0).setOnComplete(
+                delegate ()
+                {
+                    newDistrict.transform.LeanMove(new Vector3(x, y, newDistrict.transform.position.z), 1).setEaseOutCubic();
+                });
+            master.callAddDistrict(newDistrict.GetComponent<DistrictCard>().preset);
         }
     }
 
