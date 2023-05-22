@@ -17,12 +17,13 @@ public class ScreenManager : MonoBehaviour
         screens["Меню: Персонаж"] = new int[2] { 2000, 0 };
         screens["Меню: Цитадель"] = new int[2] { 4000, 0 };
         screens["Меню: Шпионаж"] = new int[2] { 2000, -1150 };
+        screens["Победа"] = new int[2] { 2000, 1150 };
 
         var dropdown = screenSelector.GetComponent<Dropdown>();
         dropdown.ClearOptions();
         foreach (var screen in screens.Keys)
         {
-            if (screen == "Подключение")
+            if (screen == "Подключение" || screen == "Победа")
             {
                 continue;
             }

@@ -1,3 +1,4 @@
+using JetBrains.Annotations;
 using Photon.Pun;
 using System.Collections;
 using System.Collections.Generic;
@@ -104,6 +105,11 @@ public class PlayerRework : MonoBehaviourPunCallbacks
         view.RPC("deleteDistrict", RpcTarget.All, preset);
     }
 
+    public void callDestroyDistrict(string preset)
+    {
+        view.RPC("destroyDistrict", RpcTarget.All, preset);
+    }
+
     public void callSetAssassinMarker(bool value)
     {
         view.RPC("setAssassinMarker", RpcTarget.All, value);
@@ -162,6 +168,17 @@ public class PlayerRework : MonoBehaviourPunCallbacks
     private void deleteDistrict(string preset)
     {
         districts.Remove(preset);
+    }
+
+    [PunRPC] 
+    private void destroyDistrict(string preset)
+    {
+        buildedDistricts.Remove(preset);
+        var cmm = GameObject.FindGameObjectWithTag("CMM").GetComponent<CitadelMenuManager>();
+        if (view.IsMine)
+        {
+            cmm.deleteBuiltDistrict(preset);
+        }
     }
 
     [PunRPC]

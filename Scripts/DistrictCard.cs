@@ -52,7 +52,7 @@ public class DistrictCard : MonoBehaviour
             {"Manor", "Поместье"},
             {"Castle", "Замок"},
             {"Palace", "Дворец"},
-            {"Haunted City", "Город Призраков"},
+            {"Haunted", "Город Призраков"},
             {"Keep", "Форт"},
             {"Laboratory", "Лаборатория"},
             {"Smithy", "Кузня"},
@@ -83,7 +83,7 @@ public class DistrictCard : MonoBehaviour
             {"Manor", "yellow"},
             {"Castle", "yellow"},
             {"Palace", "yellow"},
-            {"Haunted City", "purple"},
+            {"Haunted", "purple"},
             {"Keep", "purple"},
             {"Laboratory", "purple"},
             {"Smithy", "purple"},
@@ -114,7 +114,7 @@ public class DistrictCard : MonoBehaviour
             {"Manor", 3},
             {"Castle", 4},
             {"Palace", 5},
-            {"Haunted City", 2},
+            {"Haunted", 2},
             {"Keep", 3},
             {"Laboratory", 5},
             {"Smithy", 5},
@@ -161,7 +161,7 @@ public class DistrictCard : MonoBehaviour
         cmm.distCardBuild(cardObject);
     }
 
-    public void OnDestroy()
+    public void destroying()
     {
         var ssm = GameObject.FindGameObjectWithTag("SSM").GetComponent<SpyScreenManager>();
         ssm.WarlordDestroy(cardObject);

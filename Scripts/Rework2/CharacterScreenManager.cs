@@ -21,7 +21,7 @@ public class CharacterScreenManager : MonoBehaviour
     public GameObject distPrefab;
     public GameObject camera;
 
-    private Dictionary<string, string> distColor = new Dictionary<string, string>() {
+    public Dictionary<string, string> distColor = new Dictionary<string, string>() {
             {"Tavern", "green"},
             {"Market", "green"},
             {"Trading Post", "green"},
@@ -39,7 +39,7 @@ public class CharacterScreenManager : MonoBehaviour
             {"Manor", "yellow"},
             {"Castle", "yellow"},
             {"Palace", "yellow"},
-            {"Haunted City", "purple"},
+            {"Haunted", "purple"},
             {"Keep", "purple"},
             {"Laboratory", "purple"},
             {"Smithy", "purple"},
@@ -60,6 +60,36 @@ public class CharacterScreenManager : MonoBehaviour
             { "Merchant", "Купец"},
             { "Warlord", "Кондотьер"},
             { "King", "Король"},
+        };
+    public Dictionary<string, int> distPrice = new Dictionary<string, int>() {
+            {"Tavern", 1},
+            {"Market", 2},
+            {"Trading Post", 2},
+            {"Docks", 3},
+            {"Harbor", 4},
+            {"Town Hall", 5},
+            {"Temple", 1},
+            {"Church", 2},
+            {"Monastery", 3},
+            {"Cathedral", 5},
+            {"Watchtower", 1},
+            {"Prison", 2},
+            {"Battlefield", 3},
+            {"Fortress", 5},
+            {"Manor", 3},
+            {"Castle", 4},
+            {"Palace", 5},
+            {"Haunted", 2},
+            {"Keep", 3},
+            {"Laboratory", 5},
+            {"Smithy", 5},
+            {"Observatory", 5},
+            {"Graveyard", 5},
+            {"School of Magic", 6},
+            {"Library", 6},
+            {"Great Wall", 6},
+            {"University", 8},
+            {"Dragon Gate", 8},
         };
 
     private bool ourTurn = false;
@@ -270,6 +300,7 @@ public class CharacterScreenManager : MonoBehaviour
 
     public void endTurnButtonClick()
     {
+        var tm = GameObject.FindGameObjectWithTag("TurnManager").GetComponent<TurnManager>();
         switch (getMasterPlayer().GetComponent<PlayerRework>().character)
         {
             case "Thief":
@@ -279,9 +310,17 @@ public class CharacterScreenManager : MonoBehaviour
             case "Magician":
                 handleMagicianSkill(); break;
         }
+        foreach (var card in GameObject.FindGameObjectsWithTag("SpyMenuDistrict"))
+        {
+            card.GetComponent<DistrictCard>().destroyButton.SetActive(false);
+        }
+        var master = getMasterPlayer().GetComponent<PlayerRework>();
+        if (master.buildedDistricts.Count == 8) 
+        {
+            tm.callWin(master.id);
+        }
         endTurnButton.SetActive(false);
-        var tm = GameObject.FindGameObjectWithTag("TurnManager");
-        tm.GetComponent<TurnManager>().callEndTurn();
+        tm.callEndTurn();
         GameObject.FindGameObjectWithTag("SkillTargetSelector").LeanScale(new Vector3(0f, 0f, 1f), 0);
     }
 
@@ -523,6 +562,10 @@ public class CharacterScreenManager : MonoBehaviour
                         break;
                     case "Warlord":
                         text = "Активная способность:\n★ Выберите игрока и его район, который будет разрушен\n(Меню шпионажа)";
+                        foreach (var card in GameObject.FindGameObjectsWithTag("SpyMenuDistrict"))
+                        {
+                            card.GetComponent<DistrictCard>().destroyButton.SetActive(true);
+                        }
                         break;
                     case "Magician":
                         text = "Активная способность:\n★ Выберите игрока, с которым вы обменяетесь картами районов\nИЛИ Сбросьте свои карты в колоду и\n получите столько же новых";

@@ -8,6 +8,8 @@ public class TurnManager : MonoBehaviourPunCallbacks
     PhotonView view;
     public int[] queue = null;
 
+    private int winner = -1;
+
     public GameObject endTurnButton;
 
     public int stage = 0;
@@ -52,6 +54,15 @@ public class TurnManager : MonoBehaviourPunCallbacks
         var dm = GameObject.FindGameObjectWithTag("DeckManager");
         if (currentQueueIndex >= queue.Length)
         {
+            if (winner != -1)
+            {
+                var screenManager = GameObject.FindGameObjectWithTag("ScreenManager").GetComponent<ScreenManager>();
+                screenManager.switchScreen("ѕобеда");
+
+                var victoryMenuManager = GameObject.FindGameObjectWithTag("VMM").GetComponent<VictoryMenuManager>();
+                victoryMenuManager.endgame();
+                return;
+            }
             currentQueueIndex = 0;
             if (stage == 0)
             {
@@ -63,7 +74,7 @@ public class TurnManager : MonoBehaviourPunCallbacks
             {
                 stage = 0;
                 dm.GetComponent<DeckManager>().callGenerateDeck();
-                refillQueueByPlayerID(); // заменить на Seating, когда он будет готов
+                refillQueueBySeating();
                 csm.GetComponent<CharacterScreenManager>().resetCharacterAndTurn(queue[0], stage);
             }
             
@@ -72,6 +83,11 @@ public class TurnManager : MonoBehaviourPunCallbacks
         {
             csm.GetComponent<CharacterScreenManager>().turn(queue[currentQueueIndex], stage);
         }
+    }
+
+    public int getWinner()
+    {
+        return winner;
     }
 
     public void callRefillQueueByPlayerID()
@@ -87,6 +103,15 @@ public class TurnManager : MonoBehaviourPunCallbacks
     public void callRefillQueueBySeating()
     {
         view.RPC("refillQueueBySeating", RpcTarget.All);
+    }
+
+    public void callWin(int id)
+    {
+        if (winner != -1)
+        {
+            return;
+        }
+        view.RPC("win", RpcTarget.All, id);
     }
 
     [PunRPC]
@@ -133,13 +158,53 @@ public class TurnManager : MonoBehaviourPunCallbacks
         // ѕри такой "рассадке" ƒолжна получитьс€ очередь [3, 4, 1, 2]
         // id-шники смотреть - player.
 
+        refillQueueByPlayerID();
+        return;
+
         queue = new int[PhotonNetwork.CurrentRoom.PlayerCount];
         Dictionary<string, int> players = new Dictionary<string, int>();
+        int max_id = 0;
         foreach (GameObject player in GameObject.FindGameObjectsWithTag("Player"))
         {
             players[player.GetComponent<PlayerRework>().character] = player.GetComponent<PlayerRework>().id;
+            if (player.GetComponent<PlayerRework>().id > max_id)
+            {
+                max_id = player.GetComponent<PlayerRework>().id;
+            }
         }
 
+        if (!players.ContainsKey("King"))
+        {
+            refillQueueByPlayerID();
+            return;
+        }
+
+        queue[0] = players["King"];
+        int i = 1;
+        int value = queue[0];
+        while (true)
+        {
+            if (queue.Length == i)
+            {
+                break;
+            }
+            if (value == max_id)
+            {
+                value = 1;
+            }
+            else
+            {
+                value++;
+            }
+            queue[i] = value;
+            i++;
+        }
         // в словаре players сейчас ключи-персонажи, значени€-id игроков
+    }
+
+    [PunRPC]
+    private void win(int id)
+    {
+        winner = id;
     }
 }

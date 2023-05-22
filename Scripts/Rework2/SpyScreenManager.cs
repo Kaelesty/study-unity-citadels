@@ -9,9 +9,7 @@ public class SpyScreenManager : MonoBehaviour
 {
 
     List<string> players = new List<string>();
-
-    private string prevTargetCharacter;
-    private List<string> prevTargetDistricts;
+    private int prevDistrictsLength = -1;
 
     public GameObject targetSelector;
     public void init()
@@ -46,13 +44,7 @@ public class SpyScreenManager : MonoBehaviour
         var csm = GameObject.FindGameObjectWithTag("CSM").GetComponent<CharacterScreenManager>();
         var master = csm.getMasterPlayer().GetComponent<PlayerRework>();
 
-        foreach (var card in GameObject.FindGameObjectsWithTag("SpyMenuDistrict"))
-        {
-            if (card != null)
-            {
-                Destroy(card);
-            }
-        }
+        
         var previousCharacter = GameObject.FindGameObjectWithTag("SpyMenuCharacter");
         if (previousCharacter != null)
         {
@@ -71,7 +63,6 @@ public class SpyScreenManager : MonoBehaviour
             targetNickname = dropdown.options[dropdown.value].text;
         }
         catch {
-            Debug.Log("catch return");
             return;
         }
         PlayerRework target = null;
@@ -106,6 +97,19 @@ public class SpyScreenManager : MonoBehaviour
         cardChar.transform.LeanScale(new Vector3(2.75f, 2.75f, 1f), 0);
         cardChar.tag = "SpyMenuCharacter";
         cardChar.GetComponent<CharacterCard>().takeButton.SetActive(false);
+
+        if (target.buildedDistricts.Count == prevDistrictsLength)
+        {
+            return;
+        }
+        foreach (var card in GameObject.FindGameObjectsWithTag("SpyMenuDistrict"))
+        {
+            if (card != null)
+            {
+                Destroy(card);
+            }
+        }
+        prevDistrictsLength = target.buildedDistricts.Count;
 
         for (int i = 0; i < target.buildedDistricts.Count; i++)
         {
@@ -146,7 +150,7 @@ public class SpyScreenManager : MonoBehaviour
                 target = player.GetComponent<PlayerRework>();
             }
         }
-        target.callDeleteDistrict(card.GetComponent<DistrictCard>().preset);
+        target.callDestroyDistrict(card.GetComponent<DistrictCard>().preset);
         target.callAskToUpdateCitadel();
     }
 }

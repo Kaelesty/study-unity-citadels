@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Timeline;
 
 public class CitadelMenuManager : MonoBehaviour
 {
@@ -69,6 +70,7 @@ public class CitadelMenuManager : MonoBehaviour
                             delegate ()
                             {
                                 building = false;
+                                updateCitadel();
                             });
                     });
             });
@@ -83,6 +85,31 @@ public class CitadelMenuManager : MonoBehaviour
         for (int i = 0; i < cards.Length; i++)
         {
             cards[i].transform.LeanMove(new Vector3(x0 + i * 140, y0, 200), 0.5f).setEaseInOutCubic();
+        }
+
+        cards = GameObject.FindGameObjectsWithTag("PlayerBuiltDistrict");
+        x0 = 3250;
+        y0 = 100;
+        for (int i = 0; i < cards.Length; i++)
+        {
+            cards[i].transform.LeanMove(new Vector3(x0 + i * 210, y0, 200), 0.5f).setEaseInOutCubic();
+        }
+    }
+
+    public void deleteBuiltDistrict(string preset)
+    {
+        foreach (var card in GameObject.FindGameObjectsWithTag("PlayerBuiltDistrict"))
+        {
+            if (card.GetComponent<DistrictCard>().preset == preset)
+            {
+                card.transform.LeanScale(new Vector3(0f, 0f, 1f), 1).setEaseOutQuad().setOnComplete(
+                    delegate ()
+                    {
+                        Destroy(card);
+                        updateCitadel();
+                    });
+                break;
+            }
         }
     }
 }
