@@ -75,28 +75,15 @@ public class SpyScreenManager : MonoBehaviour
         }
 
         var cardChar = csm.InstantiateCharCard(presetChar);
-        cardChar.transform.LeanMove(new Vector3(2000, 0, cardChar.transform.position.z), 1);
+        cardChar.transform.LeanMove(new Vector3(1300, -1200, cardChar.transform.position.z), 1);
         cardChar.tag = "SpyMenuCharacter";
 
         for (int i = 0; i < target.buildedDistricts.Count; i++)
         {
             presetDist = target.buildedDistricts[i];
             var cardDist = csm.InstantiateDistrictCard(presetDist);
-            cardDist.transform.LeanMove(new Vector3(1800 + i*shift, 1150, cardChar.transform.position.z), 1);
+            cardDist.transform.LeanMove(new Vector3(1750 + i*shift, -1135, cardChar.transform.position.z), 1);
             cardDist.tag = "SpyMenuDistricts";
         }
-        // TODO : Экран шпионажа
-        // В переменной targetNickname лежит НИКНЕЙМ игрока, за которым хотим шпионить
-        // В переменной targets лежит список ОБЪЕКТОВ игроков
-        // Нужно: пройтись по списку targets, найти игрока у которого nickname == targetNickname, записать его объект в target
-        // Далее, если target.characterShown == true, создать карту персонажа с пресетом target.Character, 
-        // иначе создать карту персонажа с пресетом "unknown"
-        // (создать карту персонажа -> var card = csm.InstantiateCharCard(<пресет>))
-        // передвинуть эту карту в нужное место на экране (В окошко "Персонаж")
-        // Далее, пройтись по списку target.buildedDistricts (в нем лежат пресеты построенныхй районов)
-        // для каждого из них создать карту района
-        // (создать карту района -> var card = csm.InstantiateDistCard(<пресет>))
-        // каждую из этих карт передвитуть на нужную позицию на экране (В окошко "Цитадель")
-        // похвалить себя за то как все шикарно сделано
     }
 }
