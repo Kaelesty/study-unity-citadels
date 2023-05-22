@@ -8,7 +8,7 @@ public class VictoryMenuManager : MonoBehaviour
     public GameObject message;
     public void endgame()
     {
-        var csm = GameObject.FindGameObjectWithTag("CSM");
+        var csm = GameObject.FindGameObjectWithTag("CSM").GetComponent<CharacterScreenManager>();
         var tm = GameObject.FindGameObjectWithTag("TurnManager").GetComponent<TurnManager>();
         List<PlayerRework> players = new List<PlayerRework>();
         string result = "";
@@ -17,11 +17,16 @@ public class VictoryMenuManager : MonoBehaviour
         var colors = new List<string>();
         int maxPoints = 0;
         List<PlayerRework> winners = new List<PlayerRework>();
-        var buildedDistricts = player.buildedDistricts;
 
         foreach (GameObject player in GameObject.FindGameObjectsWithTag("Player"))
         {
             players.Add(player.GetComponent<PlayerRework>());
+            
+        }
+
+        foreach (var player in players)
+        {
+            var buildedDistricts = player.buildedDistricts;
             foreach (var district in buildedDistricts)
             {
                 var districtPrice = csm.distPrice[district];
@@ -66,10 +71,9 @@ public class VictoryMenuManager : MonoBehaviour
                 winners.Add(player);
             }
 
-
+            result += $"{player.nickname}: {points}\n";
         }
 
-        result += $"{player.nickname}: {points}\n";
 
         message.GetComponent<Text>().text = result;
 
