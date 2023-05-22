@@ -268,8 +268,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8da210353bbe8e749adea559fe3dc4a6, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  player: {fileID: 5518892868773519041, guid: b537247b043c5b240a45711487a40b54, type: 3}
-  currId: 0
 --- !u!4 &329220375
 Transform:
   m_ObjectHideFlags: 0
@@ -454,8 +452,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 17d62c4fe01f0ec44bf32eeafe55cafa, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  deck: []
-  laidOutPublic: 
 --- !u!4 &711633248
 Transform:
   m_ObjectHideFlags: 0
@@ -598,7 +594,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: bb79557e9de6fd7489f74ab7c210ddd0, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  networkID: -1
 --- !u!4 &1178739009
 Transform:
   m_ObjectHideFlags: 0

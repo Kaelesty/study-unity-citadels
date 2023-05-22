@@ -74,4 +74,15 @@ public class CitadelMenuManager : MonoBehaviour
             });
 
     }
+
+    public void updateCitadel()
+    {
+        var cards = GameObject.FindGameObjectsWithTag("PlayerDistrictCard");
+        int x0 = 3200;
+        int y0 = -320;
+        for (int i = 0; i < cards.Length; i++)
+        {
+            cards[i].transform.LeanMove(new Vector3(x0 + i * 140, y0, 200), 0.5f).setEaseInOutCubic();
+        }
+    }
 }

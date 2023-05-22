@@ -13,7 +13,7 @@ public class PlayerRework : MonoBehaviourPunCallbacks
 
     public bool characterShown;
 
-    private int balance = 0;
+    public int balance = 0;
 
     public List<string> districts = new List<string>();
     public List<string> buildedDistricts = new List<string>();
@@ -109,6 +109,11 @@ public class PlayerRework : MonoBehaviourPunCallbacks
         view.RPC("setAssassinMarker", RpcTarget.All, value);
     }
 
+    public void callSetCharacterShown(bool value)
+    {
+        view.RPC("setCharacterShown", RpcTarget.All, value);
+    }
+
     public bool getAssassinMarker()
     {
         return assassinMarker;
@@ -166,6 +171,12 @@ public class PlayerRework : MonoBehaviourPunCallbacks
     }
 
     [PunRPC]
+    private void setCharacterShown(bool value)
+    {
+        characterShown = value;
+    }
+
+    [PunRPC]
     private void setMessage(string message)
     {
         var csm = GameObject.FindGameObjectWithTag("CSM").GetComponent<CharacterScreenManager>();
@@ -202,6 +213,21 @@ public class PlayerRework : MonoBehaviourPunCallbacks
         {
             var csm = GameObject.FindGameObjectWithTag("CSM").GetComponent<CharacterScreenManager>();
             csm.setMasterDistricts(newDistricts);
+        }
+    }
+
+    public void callAskToUpdateCitadel()
+    {
+        view.RPC("askToUpdateCitadel", RpcTarget.All);
+    }
+
+    [PunRPC]
+    private void askToUpdateCitadel()
+    {
+        if (view.IsMine)
+        {
+            var cmm = GameObject.FindGameObjectWithTag("CMM").GetComponent<CitadelMenuManager>();
+            cmm.updateCitadel();
         }
     }
 }

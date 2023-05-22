@@ -11,6 +11,8 @@ public class DistrictCard : MonoBehaviour
     public GameObject buildedButton;
     public GameObject imageSlot;
 
+    public GameObject destroyButton;
+
     public Player owner;
     public CharacterCard script;
     public GameObject cardObject;
@@ -157,6 +159,12 @@ public class DistrictCard : MonoBehaviour
     {
         var cmm = GameObject.FindGameObjectWithTag("CMM").GetComponent<CitadelMenuManager>();
         cmm.distCardBuild(cardObject);
+    }
+
+    public void OnDestroy()
+    {
+        var ssm = GameObject.FindGameObjectWithTag("SSM").GetComponent<SpyScreenManager>();
+        ssm.WarlordDestroy(cardObject);
     }
 
     public void shake()

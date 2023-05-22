@@ -62,7 +62,7 @@ public class CharacterScreenManager : MonoBehaviour
             { "King", "Король"},
         };
 
-
+    private bool ourTurn = false;
 
 
     private void Awake()
@@ -89,6 +89,11 @@ public class CharacterScreenManager : MonoBehaviour
         cmm.updatePlayerDistricts(master.districts);
     }
 
+    public bool checkOurTurn()
+    {
+        return ourTurn;
+    }
+
     public GameObject getMasterPlayer()
     {
         foreach (GameObject player in GameObject.FindGameObjectsWithTag("Player"))
@@ -106,6 +111,7 @@ public class CharacterScreenManager : MonoBehaviour
         var master = getMasterPlayer().GetComponent<PlayerRework>();
         if (callFromCharReset)
         {
+            master.callSetCharacterShown(false);
             var resourcesMenu = GameObject.FindGameObjectWithTag("ResourcesMenu");
             resourcesMenu.transform.LeanScale(new Vector3(0f, 0f, 1), 1).setEaseOutCubic();
             resourcesMenuHeader.GetComponent<Text>().text = "Выберите карту";
@@ -115,6 +121,7 @@ public class CharacterScreenManager : MonoBehaviour
             description.transform.LeanScale(new Vector3(0f, 0f, 1), 0);
         }
         if (master.checkView() && master.id == id) {
+            ourTurn = true;
             if (master.getAssassinMarker())
             {
                 master.callSetAssassinMarker(false);
@@ -157,6 +164,7 @@ public class CharacterScreenManager : MonoBehaviour
             }
             else
             {
+                master.callSetCharacterShown(true);
                 createResourcesVariants();
                 endTurnButton.SetActive(true);
 
@@ -169,6 +177,7 @@ public class CharacterScreenManager : MonoBehaviour
         }
         else
         {
+            ourTurn = false;
             gamestateIndicator.GetComponent<Text>().text = "Ожидание хода...";
             endTurnButton.SetActive(false);
             foreach (GameObject card in GameObject.FindGameObjectsWithTag("DistrictCard"))
