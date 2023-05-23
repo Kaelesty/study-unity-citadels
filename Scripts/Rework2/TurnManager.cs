@@ -158,8 +158,8 @@ public class TurnManager : MonoBehaviourPunCallbacks
         // ѕри такой "рассадке" ƒолжна получитьс€ очередь [3, 4, 1, 2]
         // id-шники смотреть - player.
 
-        refillQueueByPlayerID();
-        return;
+        //refillQueueByPlayerID();
+        //return;
 
         queue = new int[PhotonNetwork.CurrentRoom.PlayerCount];
         Dictionary<string, int> players = new Dictionary<string, int>();
@@ -181,22 +181,14 @@ public class TurnManager : MonoBehaviourPunCallbacks
 
         queue[0] = players["King"];
         int i = 1;
-        int value = queue[0];
-        while (true)
+        for (int j = queue[0] + 1; j < max_id; j++)
         {
-            if (queue.Length == i)
-            {
-                break;
-            }
-            if (value == max_id)
-            {
-                value = 1;
-            }
-            else
-            {
-                value++;
-            }
-            queue[i] = value;
+            queue[i] = j;
+            i++;
+        }
+        for (int j = 1; j < queue[0]; j++)
+        {
+            queue[i] = j;
             i++;
         }
         // в словаре players сейчас ключи-персонажи, значени€-id игроков

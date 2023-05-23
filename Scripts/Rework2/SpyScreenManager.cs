@@ -136,7 +136,7 @@ public class SpyScreenManager : MonoBehaviour
             card.GetComponent<DistrictCard>().shake();
             return;
         }
-        master.callIncreaseBalance(-(card.GetComponent<DistrictCard>().price + 1));
+        
 
         var dropdown = targetSelector.GetComponent<Dropdown>();
         string targetNickname;
@@ -150,6 +150,12 @@ public class SpyScreenManager : MonoBehaviour
                 target = player.GetComponent<PlayerRework>();
             }
         }
+        if (target.character == "Bishop")
+        {
+            card.GetComponent<DistrictCard>().shake();
+            return;
+        }
+        master.callIncreaseBalance(-(card.GetComponent<DistrictCard>().price + 1));
         target.callDestroyDistrict(card.GetComponent<DistrictCard>().preset);
         target.callAskToUpdateCitadel();
     }
