@@ -94,10 +94,11 @@ public class DeckManager : MonoBehaviourPunCallbacks
     [PunRPC]
     private void returnDistrict(string preset)
     {
+        Debug.Log("returnDistrict");
         if (preset == "Money")
         {
             return;
         }
-        distDeck.Append(preset);
+        distDeck = distDeck.Append(preset).ToArray();
     }
 }
