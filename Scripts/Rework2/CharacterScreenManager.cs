@@ -528,6 +528,15 @@ public class CharacterScreenManager : MonoBehaviour
                         break;
                     case "King":
                         text = "Пассивная способность:\n★ Следующий ход начнется с вас";
+                        newBalance = 0;
+                        foreach (var district in master.buildedDistricts)
+                        {
+                            if (distColor[district] == "yellow")
+                            {
+                                newBalance++;
+                            }
+                        }
+                        master.callIncreaseBalance(newBalance);
                         break;
                     case "Thief":
                         text = "Активная способность:\n★ Выберите персонажа, все деньги которого\nперейдут к вам";
@@ -566,6 +575,15 @@ public class CharacterScreenManager : MonoBehaviour
                         {
                             card.GetComponent<DistrictCard>().destroyButton.SetActive(true);
                         }
+                        newBalance = 0;
+                        foreach (var district in master.buildedDistricts)
+                        {
+                            if (distColor[district] == "red")
+                            {
+                                newBalance++;
+                            }
+                        }
+                        master.callIncreaseBalance(newBalance);
                         break;
                     case "Magician":
                         text = "Активная способность:\n★ Выберите игрока, с которым вы обменяетесь картами районов\nИЛИ Сбросьте свои карты в колоду и\n получите столько же новых";
