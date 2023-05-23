@@ -178,10 +178,9 @@ public class TurnManager : MonoBehaviourPunCallbacks
             refillQueueByPlayerID();
             return;
         }
-
         queue[0] = players["King"];
         int i = 1;
-        for (int j = queue[0] + 1; j < max_id; j++)
+        for (int j = queue[0] + 1; j <= max_id; j++)
         {
             queue[i] = j;
             i++;
